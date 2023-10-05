@@ -20,7 +20,7 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [16.x, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -32,4 +32,4 @@ jobs:
         cache: 'npm'
         cache-dependency-path: ./Client/unseen/package-lock.json
     - run: npm i 
-    - run: next build
+    - run: npm run build
