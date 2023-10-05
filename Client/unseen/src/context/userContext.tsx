@@ -16,9 +16,9 @@ export const ContextProvider = ({ children }: any) => {
         publicKey: localStorage.getItem('publicKey') ? localStorage.getItem('publicKey') : null,
     } : { loggedIn: false, privateKey: null, publicKey: null });
 
-    // if (userStatus.loggedIn === false && pathname !== '/login' && pathname !== '/register') {
-    //     router.push('/login');
-    // }
+    if (userStatus.loggedIn === false && pathname !== '/login' && pathname !== '/register') {
+        router.push('/login');
+    }
 
     return (
         <Context.Provider value={{ userStatus, setUserStatus }}>
