@@ -95,7 +95,12 @@ app.post('/api/register', asyncWrapper(async (req, res) => {
     // Creates the User
     try {
         const user = await UserModel.create({ ...userHashedPass })
-        // Send response back to client
+        const token = generateAccessToken({ _id: user._id })
+        user.token.push(token);
+        await user.save();
+
+        // Set header and send response
+        res.header('auth-token', token)
         res.status(201).json(user)
     } catch (err) {
         console.log(err)
@@ -143,6 +148,41 @@ app.post('/api/login', asyncWrapper(async (req, res) => {
     else throw new Error("Incorrect Password")
 }))
 
+app.post("/api/logout", asyncWrapper(async (req, res) => {
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    if (user) {
+        const newTokens = user.token.filter((t) => t !== token)
+        user.token = newTokens
+        await user.save()
+        res.status(200).json(user)
+    } else {
+        throw new Error("User does not exist")
+    }
+}));
+
+app.post('/api/validateToken', asyncWrapper(async (req, res) => {
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    if (user) {
+        res.json(user)
+    } else {
+        throw new Error("User does not exist")
+    }
+}))
+
 server.listen(port, () => {
-    console.log(`Example app listening at https://localhost:${port}`);
+    console.log(`Example app listening at http://localhost:${port}`);
 });
