@@ -1,73 +1,69 @@
 "use client";
 import { socket } from "@/socket";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import axios from 'axios';
+import { Context } from "@/context/userContext";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { userStatus, setUserStatus } = useContext(Context);
+  const router = useRouter()
 
-  // test init
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [fooEvents, setFooEvents] = useState<any[]>([]);
+  axios.defaults.baseURL = 'https://localhost:8080/api';
 
-  // test inputs
-  const [value, setValue] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
+    // Authentication
+    if (userStatus != undefined && userStatus?.loggedIn) {
+      router.push('/');
+    }
+  }, [userStatus]);
+
+  const register = async () => {
+    if (password !== confirmPassword) {
+      console.log("passwords do not match");
+      return undefined;
     }
 
-    function onDisconnect() {
-      setIsConnected(false);
-    }
+    await axios.post('/register', {
+      username: username,
+      password: password
+    })
+      .then(function (response) {
+        const authToken = response.data.token[response.data.token.length - 1];
+        localStorage.setItem('auth-token', authToken);
+        localStorage.setItem('username', username);
+        setUserStatus({
+          username: username,
+          loggedIn: true,
+          privateKey: localStorage.getItem('privateKey') || null,
+          publicKey: localStorage.getItem('publicKey') || null,
+          authToken: authToken
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
-    function onFooEvent(value: any) {
-      setFooEvents(previous => [...previous, value]);
-    }
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('foo', onFooEvent);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('foo', onFooEvent);
-    };
-  }, []);
-
-  function connect() {
-    socket.connect();
+    setIsLoading(false);
   }
 
-  function disconnect() {
-    socket.disconnect();
-  }
-
-  function onSubmit(event: any) {
-    event.preventDefault();
-    setIsLoading(true);
-
-    socket.timeout(5000).emit('chat-message', value, () => {
-      setIsLoading(false);
-    });
+  const handleRegister = () => {
+    console.log("Registering");
+    register();
   }
 
   return (
     <>
-      <h1>Test Sockets</h1>
-      {fooEvents.map((value, index) => (
-        <p key={index}>{value}</p>
-      ))}
-      <p>Socket is {isConnected ? 'connected' : 'disconnected'}</p>
-      <button onClick={connect}>Connect</button>
-      <button onClick={disconnect}>Disconnect</button>
-
-      <form onSubmit={onSubmit}>
-        <input onChange={e => setValue(e.target.value)} />
-
-        <button type="submit" disabled={isLoading}>Submit</button>
-      </form>
+      <h1>Register page</h1>
+      <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} />
+      <input type="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} />
+      <input type="password" placeholder="confirm password" onChange={(e) => setConfirmPassword(e.target.value)} />
+      <button onClick={handleRegister}>Login</button>
     </>
   )
 }

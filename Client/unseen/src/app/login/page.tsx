@@ -1,30 +1,44 @@
 "use client";
 import { socket } from "@/socket";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from 'axios';
+import { redirect, useRouter } from "next/navigation";
+import { Context } from "@/context/userContext";
 
 export default function Home() {
+    const { userStatus, setUserStatus } = useContext(Context);
+    const router = useRouter()
 
     axios.defaults.baseURL = 'https://localhost:8080/api';
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const login = async () => {
-        if (password !== confirmPassword) {
-            console.log("passwords do not match");
-            return undefined;
+    useEffect(() => {
+        // Authentication
+        if (userStatus != undefined && userStatus?.loggedIn) {
+            router.push('/');
         }
+    }, [userStatus]);
 
+    const login = async () => {
         await axios.post('/login', {
             username: username,
             password: password
         })
             .then(function (response) {
-                console.log(response);
-                localStorage.setItem('auth-token', response.data.token);
+                const authToken = response.data.token[response.data.token.length - 1];
+                localStorage.setItem('auth-token', authToken);
+                localStorage.setItem('username', username);
+                setUserStatus({
+                    username: username,
+                    loggedIn: true,
+                    privateKey: localStorage.getItem('privateKey') || null,
+                    publicKey: localStorage.getItem('publicKey') || null,
+                    authToken: authToken
+                })
+                router.push('/');
             })
             .catch(function (error) {
                 console.log(error);
@@ -35,9 +49,7 @@ export default function Home() {
 
     const handleLogin = () => {
         console.log("logging in");
-        setIsLoading(true);
         login();
-
     }
 
     return (
@@ -45,7 +57,6 @@ export default function Home() {
             <h1>Login page</h1>
             <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} />
             <input type="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} />
-            <input type="password" placeholder="confirm password" onChange={(e) => setConfirmPassword(e.target.value)} />
             <button onClick={handleLogin}>Login</button>
         </>
     )
