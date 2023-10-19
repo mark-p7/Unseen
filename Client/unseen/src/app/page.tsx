@@ -3,9 +3,11 @@ import { socket } from "@/socket";
 import { useContext, useEffect, useState } from "react";
 import { Context } from "@/context/userContext";
 import { redirect } from 'next/navigation';
-
+import axios from "axios";
+import { useRouter } from "next/navigation";
 export default function Home() {
   const { userStatus, setUserStatus } = useContext(Context);
+  const router = useRouter();
 
   // test init
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -65,10 +67,27 @@ export default function Home() {
     });
   }
 
+  const logout = async () => {
+    await axios.post('/logout', { token: userStatus?.authToken }).then(res => {
+      setUserStatus((prevState: any) => ({ ...prevState, loggedIn: false, username: null, authToken: null }));
+      localStorage.removeItem('username');
+      localStorage.removeItem('auth-token');
+      router.push('/login');
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  const handleLogout = () => {
+    console.log("logging out")
+    logout();
+  }
+
   return (
     <>
       <h1>Home page</h1>
       {userStatus?.loggedIn ? <h1>{userStatus.username}Logged in</h1> : <h1>Not logged in</h1>}
+      <button onClick={handleLogout}>Logout</button>
       {fooEvents.map((value, index) => (
         <p key={index}>{value}</p>
       ))}
