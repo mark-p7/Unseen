@@ -184,5 +184,5 @@ app.post('/api/validateToken', asyncWrapper(async (req, res) => {
 }))
 
 server.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`Example app listening at https://localhost:${port}`);
 });
