@@ -37,80 +37,82 @@ export default function GroupChat() {
         <button>Hide group display name</button>
       </div>
       <div className="chatArea">
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
+        <div className="messageArea">
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
+          <div className="notification">User5 just joined</div>
+          <div className="message">
+            We just got the interview confirmed with our first client. - User1
+          </div>
+          <div className="warning">
+            Remember, leave all devices at home. We can't be caught doing this
+            or we risk putting their lives in danger, as well as our own! - Anon
+          </div>
         </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
-        <div className="notification">User5 just joined</div>
-        <div className="message">
-          We just got the interview confirmed with our first client. - User1
-        </div>
-        <div className="warning">
-          Remember, leave all devices at home. We can't be caught doing this or
-          we risk putting their lives in danger, as well as our own! - Anon
-        </div>
+        <textarea placeholder="Message" />
       </div>
-      <input type="text" placeholder="Message" />
     </body>
   );
 }
