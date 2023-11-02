@@ -11,6 +11,14 @@ const UserModel = require('./schemas/User.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require("dotenv");
+// Errors
+const {
+    BadRequestError,
+    DbError,
+    MissingIdError,
+    NotFoundError,
+    InvalidRouteError,
+    InvalidCredentialsError } = require('./errors/errorHandling.js')
 
 // Configure enviornment variables
 dotenv.config();
@@ -103,9 +111,7 @@ app.post('/api/register', asyncWrapper(async (req, res) => {
         res.header('auth-token', token)
         res.status(201).json(user)
     } catch (err) {
-        console.log(err)
-        console.log("Cannot create user")
-        res.status(401).json({ "Error": "Cannot create user" })
+        throw new DbError("Cannot create user")
     }
 }));
 
@@ -144,8 +150,8 @@ app.post('/api/login', asyncWrapper(async (req, res) => {
         res.json(user)
 
         // Throw Errors if User does not exist or password is incorrect
-    } else if (!user) throw new Error("User does not exist")
-    else throw new Error("Incorrect Password")
+    } else if (!user) throw new InvalidCredentialsError("Incorrect Username or Password")
+    else throw new InvalidCredentialsError("Incorrect Username or Password")
 }))
 
 app.post("/api/logout", asyncWrapper(async (req, res) => {
@@ -182,6 +188,23 @@ app.post('/api/validateToken', asyncWrapper(async (req, res) => {
         throw new Error("User does not exist")
     }
 }))
+
+// Catch all other routes
+app.get('*', asyncWrapper(async (req, res) => {
+    throw new Error("Invalid route: please check documentation")
+}))
+
+// Next Middleware to handle errors
+app.use((err, req, res, next) => {
+    if (!err.code) {
+        err.code = 500;
+    }
+    console.log(req.body)
+    // Sends detailed error message to client
+    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code, errStack: err.stack })
+    // Sends user friendly error message to client
+    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code })
+})
 
 server.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
