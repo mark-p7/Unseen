@@ -1,19 +1,46 @@
 "use client";
-import { socket } from "@/socket";
 import { useContext, useEffect, useState } from "react";
 import axios from 'axios';
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Context } from "@/context/userContext";
+import { Button } from "@/app/components/ui/button";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage,
+} from "@/app/components/ui/form"
+import { AlertCircle } from "lucide-react"
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/app/components/ui/alert"
+import { Input } from "@/app/components/ui/input"
+import { useForm } from "react-hook-form";
+import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+    username: z.string().min(2).max(50),
+    password: z.string().min(2).max(50),
+})
 
 export default function Home() {
     const { userStatus, setUserStatus } = useContext(Context);
     const router = useRouter()
+    const [isWrongPassword, setIsWrongPassword] = useState<boolean>(false);
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            username: "",
+            password: "",
+        },
+    })
 
     axios.defaults.baseURL = 'https://localhost:8080/api';
-
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         // Authentication
@@ -22,7 +49,8 @@ export default function Home() {
         }
     }, [userStatus]);
 
-    const login = async () => {
+    const login = async (username: string, password: string) => {
+        console.log("Logging in...")
         await axios.post('/login', {
             username: username,
             password: password
@@ -41,23 +69,75 @@ export default function Home() {
                 router.push('/');
             })
             .catch(function (error) {
+                if (error.response.status == 403 && error.response?.data?.errMsg == "Incorrect Username or Password") {
+                    setIsWrongPassword(true);
+                }
                 console.log(error);
             });
-
-        setIsLoading(false);
     }
 
-    const handleLogin = () => {
-        console.log("logging in");
-        login();
+    function onSubmit(values: z.infer<typeof formSchema>) {
+        login(values.username, values.password);
     }
 
     return (
         <>
-            <h1>Login page</h1>
-            <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} />
-            <input type="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} />
-            <button onClick={handleLogin}>Login</button>
+            <div className="h-screen w-screen flex justify-center items-center">
+                <div className="flex">
+                    <div className="flex justify-center items-center bg-transparent w-60">
+                        <p className="text-white text-4xl">
+                            Login
+                        </p>
+                    </div>
+                    <div>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10 mt-28">
+                                <FormField
+                                    control={form.control}
+                                    name="username"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input className="w-80" placeholder="Username" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input className="w-80" type="password" placeholder="Password" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="flex justify-center">
+                                    <Button type="submit" className="h-9">Login &rarr;</Button>
+                                </div>
+                                <div className="flex justify-center">
+                                    <p className="text-sm">
+                                        No Account? <span className="font-bold cursor-pointer" onClick={() => router.push("/register")}>Register &rarr;</span>
+                                    </p>
+                                </div>
+                                {isWrongPassword &&
+                                    <Alert variant="destructive">
+                                        <AlertCircle className="h-4 w-4" />
+                                        <AlertTitle>Error</AlertTitle>
+                                        <AlertDescription>
+                                            Wrong Username or Password
+                                        </AlertDescription>
+                                    </Alert>
+                                }
+                            </form>
+                        </Form>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }

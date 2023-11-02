@@ -1,20 +1,41 @@
 "use client";
-import { socket } from "@/socket";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import axios from 'axios';
 import { Context } from "@/context/userContext";
 import { useRouter } from "next/navigation";
+import { Button } from "@/app/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/app/components/ui/form"
+import { Input } from "@/app/components/ui/input"
+import { useForm } from "react-hook-form";
+import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+  username: z.string().min(2).max(50),
+  password: z.string().min(2).max(50),
+  passwordConfirm: z.string().min(2).max(50),
+}).refine(({ password, passwordConfirm }) => password === passwordConfirm, { message: "Passwords do not match", path: ["passwordConfirm"] });
 
 export default function Home() {
   const { userStatus, setUserStatus } = useContext(Context);
   const router = useRouter()
 
-  axios.defaults.baseURL = 'https://localhost:8080/api';
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      passwordConfirm: ""
+    },
+  })
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  axios.defaults.baseURL = 'https://localhost:8080/api';
 
   useEffect(() => {
     // Authentication
@@ -23,47 +44,92 @@ export default function Home() {
     }
   }, [userStatus]);
 
-  const register = async () => {
-    if (password !== confirmPassword) {
-      console.log("passwords do not match");
-      return undefined;
-    }
-
+  const register = async (username: string, password: string) => {
+    console.log("Registering...");
     await axios.post('/register', {
       username: username,
       password: password
-    })
-      .then(function (response) {
-        const authToken = response.data.token[response.data.token.length - 1];
-        localStorage.setItem('auth-token', authToken);
-        localStorage.setItem('username', username);
-        setUserStatus({
-          username: username,
-          loggedIn: true,
-          privateKey: localStorage.getItem('privateKey') || null,
-          publicKey: localStorage.getItem('publicKey') || null,
-          authToken: authToken
-        })
+    }).then(function (response) {
+      const authToken = response.data.token[response.data.token.length - 1];
+      localStorage.setItem('auth-token', authToken);
+      localStorage.setItem('username', username);
+      setUserStatus({
+        username: username,
+        loggedIn: true,
+        privateKey: localStorage.getItem('privateKey') || null,
+        publicKey: localStorage.getItem('publicKey') || null,
+        authToken: authToken
       })
-      .catch(function (error) {
-        console.log(error);
-      });
-
-    setIsLoading(false);
+    }).catch(function (error) {
+      console.log(error);
+    });
   }
 
-  const handleRegister = () => {
-    console.log("Registering");
-    register();
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    register(values.username, values.password);
   }
 
   return (
     <>
-      <h1>Register page</h1>
-      <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} />
-      <input type="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} />
-      <input type="password" placeholder="confirm password" onChange={(e) => setConfirmPassword(e.target.value)} />
-      <button onClick={handleRegister}>Login</button>
+      <div className="h-screen w-screen flex justify-center items-center">
+        <div className="flex">
+          <div className="flex justify-center items-center bg-transparent w-60">
+            <p className="text-white text-4xl">
+              Register
+            </p>
+          </div>
+          <div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10 mt-28">
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input className="w-80" placeholder="Username" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input className="w-80" type="password" placeholder="Password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="passwordConfirm"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input className="w-80" type="password" placeholder="Confirm Password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-center">
+                  <Button type="submit" className="h-9">Register &rarr;</Button>
+                </div>
+                <div className="flex justify-center">
+                  <p className="text-sm">
+                    Already have an account? <span className="font-bold cursor-pointer" onClick={() => router.push("/login")}>Login &rarr;</span>
+                  </p>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      </div>
     </>
   )
 }
