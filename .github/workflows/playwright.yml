@@ -27,7 +27,7 @@ jobs:
       - name: Start Client
         run: |
           npm i
-          npm run dev
+          npm run dev &
         working-directory: Client/unseen/
 
       - name: Install Playwright dependencies
