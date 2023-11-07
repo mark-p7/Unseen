@@ -4,16 +4,33 @@ on:
     branches: [main, playwright, dev]
   pull_request:
     branches: [main, playwright, dev]
+
 jobs:
-  test:
+  setup-and-test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Install dependencies
+
+      - name: Start Server
+        run: |
+          npm install
+          node server.js &
+        working-directory: Server
+
+      - name: Start Client
+        run: |
+          npm i
+          npm run dev
+        working-directory: Client/unseen/
+
+      - name: Install Playwright dependencies
         run: npm ci
         working-directory: playwright
 
@@ -25,7 +42,8 @@ jobs:
         run: npx playwright test
         working-directory: playwright
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report
