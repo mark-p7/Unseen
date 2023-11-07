@@ -13,10 +13,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: directory to playwright
-        run: cd playwright
       - name: Install dependencies
-        run: npm ci
+        run: npm ci ./playwright/package-lock.json
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
