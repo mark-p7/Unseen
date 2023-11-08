@@ -26,11 +26,11 @@ jobs:
 
       - name: setting up cert
         run: echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.CERT }}\n-----END CERTIFICATE-----" > cert.pem
-        working-directory: server/conf/
+        working-directory: Server/conf/
 
       - name: setting up key
         run: echo -e "-----BEGIN ENCRYPTED PRIVATE KEY-----\n${{ secrets.KEY }}\n-----END ENCRYPTED PRIVATE KEY-----" > key.pem
-        working-directory: server/conf/
+        working-directory: Server/conf/
 
       - name: Start Server
         run: |
