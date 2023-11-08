@@ -20,15 +20,15 @@ jobs:
 
       - name: Setting up .env
         run: |
-          echo "TOKEN_SECRET=\"${{ secrets.TOKEN_SECRET }}\"" > .env
-          echo "MONGO_URI=\"${{ secrets.MONGO_URI }}\"" >> .env
+          echo -e "TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}\n" > .env
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
         working-directory: Server
 
       - name: Setting up cert and key
         run: |
           mkdir -p conf
-          echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.CERT }}\n-----END CERTIFICATE-----" > conf/cert.pem
-          echo -e "-----BEGIN ENCRYPTED PRIVATE KEY-----\n${{ secrets.KEY }}\n-----END ENCRYPTED PRIVATE KEY-----" > conf/key.pem
+          echo -e "${{ secrets.CERT }}" > conf/cert.pem
+          echo -e "${{ secrets.KEY }}" > conf/key.pem
         working-directory: Server
 
       - name: Install Server dependencies and Start Server
