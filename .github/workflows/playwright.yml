@@ -17,12 +17,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: setting up secrerts
+      - name: setting up env
         run: |
-          echo "TOKEN_SECRET=\"${{ secrets.TOKEN_SECRET }}\"" > server/.env
-          echo "MONGO_URI=\"${{ secrets.MONGO_URI }}\"" >> server/.env
-          echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.CERT }}\n-----END CERTIFICATE-----" > server/conf/cert.pem
-          echo -e "-----BEGIN ENCRYPTED PRIVATE KEY-----\n${{ secrets.KEY }}\n-----END ENCRYPTED PRIVATE KEY-----" > server/conf/key.pem
+          echo "TOKEN_SECRET=\"${{ secrets.TOKEN_SECRET }}\"" > .env
+          echo "MONGO_URI=\"${{ secrets.MONGO_URI }}\"" >> .env
+
+        working-directory: Server
+
+      - name: setting up cert
+        run: echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.CERT }}\n-----END CERTIFICATE-----" > cert.pem
+        working-directory: server/conf/
+
+      - name: setting up key
+        run: echo -e "-----BEGIN ENCRYPTED PRIVATE KEY-----\n${{ secrets.KEY }}\n-----END ENCRYPTED PRIVATE KEY-----" > key.pem
+        working-directory: server/conf/
 
       - name: Start Server
         run: |
