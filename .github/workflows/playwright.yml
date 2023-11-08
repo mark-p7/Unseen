@@ -18,11 +18,11 @@ jobs:
         with:
           node-version: 18
       - name: setting up secrerts
-        run: echo "${{ secrets.CERT }}"
-          echo "${{ secrets.KEY }}"
-          echo "${{ secrets.MONGO_URI }}"
-          echo "${{ secrets.TOKEN_SECRET }}"
-        working-directory: Server
+        run: |
+          echo "TOKEN_SECRET=\"${{ secrets.TOKEN_SECRET }}\"" > server/.env
+          echo "MONGO_URI=\"${{ secrets.MONGO_URI }}\"" >> server/.env
+          echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.CERT }}\n-----END CERTIFICATE-----" > server/conf/cert.pem
+          echo -e "-----BEGIN ENCRYPTED PRIVATE KEY-----\n${{ secrets.KEY }}\n-----END ENCRYPTED PRIVATE KEY-----" > server/conf/key.pem
 
       - name: Start Server
         run: |
