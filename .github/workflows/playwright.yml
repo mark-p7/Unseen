@@ -17,6 +17,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: setting up secrerts
+        run: echo "${{ secrets.CERT }}"
+          echo "${{ secrets.KEY }}"
+          echo "${{ secrets.MONGO_URI }}"
+          echo "${{ secrets.TOKEN_SECRET }}"
+        working-directory: Server
 
       - name: Start Server
         run: |
