@@ -17,31 +17,31 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: setting up env
+
+      - name: Setting up .env
         run: |
           echo "TOKEN_SECRET=\"${{ secrets.TOKEN_SECRET }}\"" > .env
           echo "MONGO_URI=\"${{ secrets.MONGO_URI }}\"" >> .env
-
         working-directory: Server
 
-      - name: setting up cert and key
+      - name: Setting up cert and key
         run: |
-          mkdir conf
-          echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.CERT }}\n-----END CERTIFICATE-----" > cert.pem
-          echo -e "-----BEGIN ENCRYPTED PRIVATE KEY-----\n${{ secrets.KEY }}\n-----END ENCRYPTED PRIVATE KEY-----" > key.pem
+          mkdir -p conf
+          echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.CERT }}\n-----END CERTIFICATE-----" > conf/cert.pem
+          echo -e "-----BEGIN ENCRYPTED PRIVATE KEY-----\n${{ secrets.KEY }}\n-----END ENCRYPTED PRIVATE KEY-----" > conf/key.pem
         working-directory: Server
 
-      - name: Start Server
+      - name: Install Server dependencies and Start Server
         run: |
           npm install
-          node server.js &
+          npm start &
         working-directory: Server
 
-      - name: Start Client
+      - name: Install and Start Client
         run: |
-          npm i
+          npm install
           npm run dev &
-        working-directory: Client/unseen/
+        working-directory: Client/unseen
 
       - name: Install Playwright dependencies
         run: npm ci
@@ -60,5 +60,5 @@ jobs:
       #   if: always()
       #   with:
       #     name: playwright-report
-      #     path: playwright/playwright-report/
+      #     path: playwright-report/
       #     retention-days: 30
