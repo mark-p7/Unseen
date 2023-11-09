@@ -15,6 +15,7 @@ import { Input } from "@/app/components/ui/input"
 import { useForm } from "react-hook-form";
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Navbar } from "@/app/components/navbar";
 
 const formSchema = z.object({
   username: z.string().min(2).max(50),
@@ -71,8 +72,9 @@ export default function Home() {
 
   return (
     <>
-      <div className="h-screen w-screen flex justify-center items-center">
-        <div className="flex">
+      <Navbar isLoggedIn={false} />
+      <div className="h-[calc(100vh-67px)] w-screen flex justify-center items-center">
+        <div className="flex mb-28">
           <div className="flex justify-center items-center bg-transparent w-60">
             <p className="text-white text-4xl">
               Register
