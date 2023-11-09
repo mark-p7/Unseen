@@ -1,0 +1,64 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [main, playwright, dev]
+  pull_request:
+    branches: [main, playwright, dev]
+
+jobs:
+  setup-and-test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Setting up .env
+        run: |
+          echo -e "TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}\n" > .env
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+        working-directory: Server
+
+      - name: Setting up cert and key
+        run: |
+          mkdir -p conf
+          echo -e "${{ secrets.CERT }}" > conf/cert.pem
+          echo -e "${{ secrets.KEY }}" > conf/key.pem
+        working-directory: Server
+
+      - name: Install Server dependencies and Start Server
+        run: |
+          npm install
+          npm start &
+        working-directory: Server
+
+      - name: Install and Start Client
+        run: |
+          npm install
+          npm run dev &
+        working-directory: Client/unseen
+
+      - name: Install Playwright dependencies
+        run: npm ci
+        working-directory: playwright
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: playwright
+
+      - name: Run Playwright tests
+        run: npx playwright test
+        working-directory: playwright
+
+      # - name: Upload Playwright report
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: playwright-report
+      #     path: playwright-report/
+      #     retention-days: 30
