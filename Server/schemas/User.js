@@ -14,6 +14,18 @@ const User = new mongoose.Schema({
         min: 3,
         max: 29
     },
+    displayName: {
+        type: String,
+        required: true,
+        trim: true,
+        default: "User",
+        min: 3,
+        max: 29
+    },
+    accountDeletionDate: {
+        type: Date,
+        default: null
+    },
     password: {
         type: String,
         required: true,
