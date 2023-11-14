@@ -74,6 +74,18 @@ const asyncWrapper = (fn) => {
     }
 }
 
+// Next Middleware to handle errors
+app.use((err, req, res, next) => {
+    if (!err.code) {
+        err.code = 500;
+    }
+    console.log(req.body)
+    // Sends detailed error message to client
+    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code, errStack: err.stack })
+    // Sends user friendly error message to client
+    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code })
+})
+
 // Generate Access Token
 function generateAccessToken(userId) {
     return jwt.sign(userId, process.env.TOKEN_SECRET, { expiresIn: "2h" });
@@ -374,6 +386,71 @@ app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
     }
 }))
 
+// Get User Account details
+app.post("/api/account/get", asyncWrapper(async (req, res) => {
+    console.log(req.body)
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    console.log(user)
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Get User Account details
+    const groupsJoined = user.groups.length
+    const accountDeletionDate = user.accountDeletionDate == null ? "Not Scheduled" : user.accountDeletionDate
+    const displayName = user.displayName
+
+    // Send response
+    res.status(200).json({ groupsJoined, accountDeletionDate, displayName })
+}))
+
+// Delete User Account
+app.post("/api/account/delete", asyncWrapper(async (req, res) => {
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Delete User Account
+    await UserModel.deleteOne({ token: token })
+    res.status(200).json({ message: "Account Deleted" })
+}))
+
+app.put("/api/account/update/displayname", asyncWrapper(async (req, res) => {
+    // Get Request body
+    const { token, displayName } = req.body;
+    console.log(req.body)
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Update User Account
+    user.displayName = displayName
+    await user.save()
+    res.status(200).json({ message: user.displayName })
+}));
+
+
 // Catch all other routes
 app.get('*', asyncWrapper(async (req, res) => {
     throw new Error("Invalid route: please check documentation")
@@ -392,5 +469,5 @@ app.use((err, req, res, next) => {
 })
 
 server.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`Example app listening at https://localhost:${port}`);
 });
