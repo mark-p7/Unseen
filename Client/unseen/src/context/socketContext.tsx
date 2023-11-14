@@ -44,7 +44,7 @@ export default function SocketProvider({ children,}: { children: React.ReactNode
             router.replace("/");
             return;
         }
-        let socket = socketIO.connect("https://localhost:8080");
+        let socket = socketIO.connect("https://localhost:8080/");
         socket.on("receive-message", (data: IMessage) => {
             setMessages((prev) => {
                 const newMessages = { ...prev };
