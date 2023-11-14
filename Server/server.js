@@ -50,13 +50,40 @@ const io = new Server(server, {
 });
 
 // Socket connection
+
+let groupUsers = {};
+
 io.on("connection", (socket) => {
+    io.emit("users-response", groupUsers);
     console.log("a user connected");
+
+    socket.on("join-group", (groupId) => {
+        socket.join(groupId);
+        groupUsers = {
+            ...groupUsers,
+            [groupId]: [...(groupUsers[groupId] ?? []), socket.id],
+        };
+        io.emit("users-response", groupUsers);
+        console.log(`User with ID: ${socket.id} joined group: ${groupId}`);
+    });
+
     socket.on('chat-message', (msg) => {
         console.log('message: ' + msg);
     });
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
+        for (const [groupId, users] of Object.entries(groupUsers)) {
+            if (users.includes(socket.id)) {
+                groupUsers[groupId] = [...users.filter((id) => id !== socket.id)];
+                io.emit("receive-message", {
+                    text: "A user left the group.",
+                    socketId: "abcd",
+                    groupId: groupId,
+                });
+            }
+        }
+        io.emit("users-response", groupUsers);
     });
 });
 
@@ -116,7 +143,7 @@ app.post('/api/register', asyncWrapper(async (req, res) => {
 }));
 
 /**
- * This route will be used to login a new user 
+ * This route will be used to login a new user
  * @param {req} req = { username: String, password: String }
  * @returns {res} res = { success: Boolean, message: String, cookie: String }
  */
