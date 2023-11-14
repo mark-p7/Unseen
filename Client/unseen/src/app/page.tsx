@@ -5,6 +5,7 @@ import { Context } from "@/context/userContext";
 import { redirect } from 'next/navigation';
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import AddGroupPanel from "@/app/components/GroupChat/AddGroupChat";
 
 export default function Home() {
   const { userStatus, setUserStatus } = useContext(Context);
@@ -88,6 +89,9 @@ export default function Home() {
     router.push('/group-chat');
   }
 
+  const [showAddGroupPanel, setShowAddGroupPanel] = useState(false);
+  const hideAddGroupPanel = () => setShowAddGroupPanel(false);
+
   return (
     <>
       <h1>Home page</h1>
@@ -104,8 +108,13 @@ export default function Home() {
         <input onChange={e => setValue(e.target.value)} />
 
         <button type="submit" disabled={isLoading}>Submit</button>
-        <button onClick={navigateToGroupChat}>Go to Group Chat</button>
+        <button onClick={() => setShowAddGroupPanel(true)}>Go to Group Chat</button>
       </form>
+      {showAddGroupPanel && (
+          <div>
+            <AddGroupPanel hideAddGroupPanel={hideAddGroupPanel} />
+          </div>
+      )}
     </>
   )
 }
