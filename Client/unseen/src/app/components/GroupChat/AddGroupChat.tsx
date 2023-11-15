@@ -25,7 +25,7 @@ function AddGroupPanel({ hideAddGroupPanel }: any) {
             },
         ]);
         hideAddGroupPanel(true);
-        router.replace("/group-chat/" + id);
+        router.push("/group-chat/" + id);
     };
 
     return (
