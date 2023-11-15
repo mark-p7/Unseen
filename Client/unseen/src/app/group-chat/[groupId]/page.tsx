@@ -1,118 +1,40 @@
 "use client";
-import { socket } from "@/socket";
-import { useContext, useEffect, useState } from "react";
+import ChatBody from "@/app/components/Chat/ChatBody";
+import ChatFooter from "@/app/components/Chat/ChatFooter";
+import ChatHeader from "@/app/components/Chat/ChatHeader";
+import { useSocket } from "@/context/socketContext";
 import { Context } from "@/context/userContext";
-import { redirect } from "next/navigation";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import "./styling.css";
+import { useParams } from "next/navigation";
+import React, {useContext, useEffect} from "react";
+import {Params} from "next/dist/shared/lib/router/utils/route-matcher";
 
-export default function GroupChat() {
+interface PageParams extends Params {
+  groupId: string;
+}
+
+function Page() {
+  const { groupId } = useParams<PageParams>();
+  const { socket, groupUsers } = useSocket();
   const { userStatus, setUserStatus } = useContext(Context);
-  const router = useRouter();
-
-  axios.defaults.baseURL = "https://localhost:8080/api";
 
   useEffect(() => {
-    console.log(userStatus);
-    // Authentication
-    if (userStatus != undefined && !userStatus?.loggedIn) {
-      return redirect("/login");
-    }
-  }, [userStatus]);
+    if (groupUsers[groupId]?.includes(socket?.id)) return;
+    socket?.emit("send-message", {
+      text: userStatus.username + " joined the group.",
+      socketId: "abcd",
+      groupId: groupId,
+    });
+    socket?.emit("join-group", groupId);
+  }, []);
 
-  return (
-    <body>
-      <div className="header">
-        <h1>UNSEEN</h1>
+    return (
+      <div className="flex relative flex-col w-full h-screen">
+        <ChatHeader groupId={groupId} />
+        <ChatBody groupId={groupId} />
+        <ChatFooter groupId={groupId} />
       </div>
-      <div className="sidebar">
-        <h2>Group1</h2>
-        <button>Add members</button>
-        <button>Remove members</button>
-        <button>List of members</button>
-        <button>Delete group</button>
-        <button>Auto host all*</button>
-        <button>Set how long messages stay visible</button>
-        <button>Hide group display name</button>
-      </div>
-      <div className="chatArea">
-        <div className="messageArea">
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-        </div>
-        <textarea placeholder="Message" />
-      </div>
-    </body>
   );
 }
+
+export default Page;
+
