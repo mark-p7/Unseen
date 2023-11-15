@@ -1,3 +1,4 @@
+"use client";
 import * as socketIO from "socket.io-client";
 import { Context } from "@/context/userContext";
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -36,16 +37,16 @@ export default function SocketProvider({ children,}: { children: React.ReactNode
     const [socket, setSocket] = useState<socketIO.Socket>();
     const [messages, setMessages] = useState<{ [key: string]: IMessage[] }>({});
 
-    const { username } = userStatus.username;
     const router = useRouter();
 
     useEffect(() => {
-        if (!username) {
+        if (!userStatus?.username) {
             router.replace("/");
             return;
         }
         let socket = socketIO.connect("https://localhost:8080/");
         socket.on("receive-message", (data: IMessage) => {
+            console.log(data);
             setMessages((prev) => {
                 const newMessages = { ...prev };
                 newMessages[data.groupId] = [...(newMessages[data.groupId] ?? []), data];

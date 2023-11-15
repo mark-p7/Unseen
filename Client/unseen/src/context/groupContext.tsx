@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface IGroup {
@@ -12,13 +13,13 @@ interface IGroupContext {
     setMyGroups: React.Dispatch<IGroup[]>;
 }
 
-const intialData: IGroupContext = {
+const initialData: IGroupContext = {
     groups: [],
     myGroups: [],
     setMyGroups: () => {},
 };
 
-const GroupContext = createContext<IGroupContext>(intialData);
+const GroupContext = createContext<IGroupContext>(initialData);
 
 export function useGroup() {
     return useContext(GroupContext);
