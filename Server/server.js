@@ -71,6 +71,15 @@ io.on("connection", (socket) => {
         console.log('message: ' + msg);
     });
 
+    socket.on("send-message", (data) => {
+        console.log("emitting receive");
+        io.emit("receive-message", data);
+    });
+
+    socket.on("typing", (data) => {
+        socket.broadcast.emit("typing-response", data);
+    });
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
         for (const [groupId, users] of Object.entries(groupUsers)) {
@@ -230,7 +239,7 @@ app.use((err, req, res, next) => {
     // Sends detailed error message to client
     res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code, errStack: err.stack })
     // Sends user friendly error message to client
-    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code })
+    //res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code })
 })
 
 server.listen(port, () => {
