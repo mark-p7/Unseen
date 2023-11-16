@@ -12,13 +12,6 @@ const Group = new mongoose.Schema({
         min: 1,
         max: 15
     },
-    groupPassword: {
-        type: String,
-        required: true,
-        trim: true,
-        min: 6,
-        max: 1000,
-    },
     groupOwnerId: {
         type: String
     },
