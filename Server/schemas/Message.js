@@ -3,19 +3,15 @@ const uuid = require('uuid');
 const User = require('./User');
 
 const Message = new mongoose.Schema({
-    id: {
-        default: uuid.v4(),
-        type: String
-    },
     datePosted: {
         type: Date,
         default: Date.now
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId, ref: User
+        type: String // User id
     },
     content: {
-        default: "", //should be encrypted
+        default: "", // Should be encrypted
         type: String
     }
 });

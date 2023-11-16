@@ -530,10 +530,35 @@ app.post("/api/account/delete", asyncWrapper(async (req, res) => {
 
     // Remove User from Groups
     const groupids = user.groups;
+    console.log("groupids: ", groupids);
+
     for (let i = 0; i < groupids.length; i++) {
         const group = await GroupModel.findOne({ _id: groupids[i] })
-        group.groupMember.pull(user);
-        group.groupMemberCount = group.groupMemberCount - 1;
+        console.log("<1>");
+        // Delete groups if User is owner
+        if( group.groupOwnerId.includes(user.id)){
+            console.log("<2>");
+
+            for (let i = 0; i < group.groupMembers.length; i++) {
+                const member = await UserModel.findOne({ id: group.groupMembers[i] })
+                console.log("<3>");
+
+                //console.log("user: ", member);
+                member.groups.pull(group._id);
+                await member.save();
+                //console.log("after remove group: ", member);
+            }
+            console.log("<4>");
+
+            await GroupModel.deleteOne(group)
+
+            console.log("<5>");
+
+    
+        } else {
+            group.groupMember.pull(user);
+            group.groupMemberCount = group.groupMemberCount - 1;
+        }
     }
 
     // Delete User Account
@@ -576,7 +601,7 @@ app.use((err, req, res, next) => {
     // Sends detailed error message to client
     res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code, errStack: err.stack })
     // Sends user friendly error message to client
-    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code })
+    //res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code })
 })
 
 server.listen(port, () => {

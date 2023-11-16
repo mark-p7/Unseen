@@ -24,7 +24,11 @@ const Group = new mongoose.Schema({
     },
     messages: {
         type: [String]
-    }//add message delete date later
+    },
+    messageDeleteTime: {
+        type: Number,
+        default: -1
+    }
 });
 
 module.exports = mongoose.model('Groups', Group); //Group is the name of the collection in the db
