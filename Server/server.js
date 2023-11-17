@@ -8,6 +8,8 @@ const https = require('https');
 const { Server } = require("socket.io");
 const cors = require('cors');
 const UserModel = require('./schemas/User.js')
+const GroupModel = require('./schemas/Group.js')
+const MessageModel = require('./schemas/Message.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require("dotenv");
@@ -107,6 +109,18 @@ const asyncWrapper = (fn) => {
         }
     }
 }
+
+// Next Middleware to handle errors
+app.use((err, req, res, next) => {
+    if (!err.code) {
+        err.code = 500;
+    }
+    console.log(req.body)
+    // Sends detailed error message to client
+    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code, errStack: err.stack })
+    // Sends user friendly error message to client
+    res.status(err.code).json({ errName: err.name, errMsg: err.message, errCode: err.code })
+})
 
 // Generate Access Token
 function generateAccessToken(userId) {
@@ -224,6 +238,390 @@ app.post('/api/validateToken', asyncWrapper(async (req, res) => {
         throw new Error("User does not exist")
     }
 }))
+
+
+// This route will be used to create a new group
+app.post('/api/createGroup', asyncWrapper(async (req, res) => {
+    // Obtaining body parameters
+    const { groupName, token } = req.body;
+
+    // Creates the Group
+    try {
+        const user = await UserModel.findOne({ token: token })
+
+        const group = await GroupModel.create({
+            groupName: groupName, groupOwnerId: user.id,
+            groupMembers: user.id
+        })
+
+        console.log(group);
+
+        user.groups.push(group._id);
+
+        await user.save();
+        await group.save();
+
+        res.status(200).json(group);
+    } catch (err) {
+        throw new DbError("Cannot create group")
+    }
+}));
+
+app.post('/api/getGroups', asyncWrapper(async (req, res) => {
+
+    const { token } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ token: token })
+        const groupids = user.groups;
+        console.log(groupids);
+        const groups = [];
+        for (let i = 0; i < groupids.length; i++) {
+            console.log(groupids[i]);
+            const group = await GroupModel.findOne({ _id: groupids[i] })
+            console.log('group: ', group);
+            groups.push(group);
+        }
+
+        res.json(groups);
+    } catch (err) {
+        throw new DbError("Can't get groups")
+    }
+}))
+
+app.post('/api/getGroup', asyncWrapper(async (req, res) => {
+
+    const { groupid } = req.body;
+    console.log("group id: ", groupid);
+
+    try {
+        const group = await GroupModel.findOne({ _id: groupid })
+        //console.log("<1>");
+        //console.log(group);
+        res.json(group);
+
+    } catch (err) {
+        throw new DbError("Can't get group")
+    }
+}))
+
+app.post('/api/getGroupMembers', asyncWrapper(async (req, res) => {
+
+    const { memberids } = req.body;
+    console.log("member ids: ", memberids);
+
+    try {
+        const members = [];
+        for (let i = 0; i < memberids.length; i++) {
+            const user = await UserModel.findOne({ id: memberids[i] })
+            members.push(user);
+        }
+        console.log('members: ', members);
+        res.json(members);
+
+    } catch (err) {
+        throw new DbError("Can't get group members")
+    }
+}))
+
+app.post('/api/joinGroup', asyncWrapper(async (req, res) => {
+
+    const { groupid, token } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ token: token })
+
+        const group = await GroupModel.findOne({ _id: groupid })
+
+        if (user != undefined && user != null && !user.groups.includes(groupid)) {
+            group.groupMembers.push(user.id);
+            group.groupMemberCount = group.groupMemberCount + 1;
+            user.groups.push(group._id);
+            user.invites.pull(group._id);
+
+            await group.save();
+            await user.save();
+        }
+
+        res.status(200).json("Group joined");
+
+    } catch (err) {
+        throw new DbError("Can't join group")
+    }
+}))
+
+app.post('/api/leaveGroup', asyncWrapper(async (req, res) => {
+
+    const { groupid, token } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ token: token })
+        const group = await GroupModel.findOne({ _id: groupid })
+
+        if (!group.groupOwnerId.includes(user.id)) {
+
+            group.groupMembers.pull(user.id);
+            group.groupMemberCount = group.groupMemberCount - 1;
+            user.groups.pull(group._id);
+
+            await group.save();
+            await user.save();
+        }
+
+        res.status(200).json("Left group");
+
+    } catch (err) {
+        throw new DbError("Can't leave group")
+    }
+}))
+
+app.post('/api/removeMember', asyncWrapper(async (req, res) => {
+
+    const { groupid, userid } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ id: userid })
+        console.log(user);
+        const group = await GroupModel.findOne({ _id: groupid })
+        console.log(group);
+
+        if (group.groupOwnerId.includes(user.id)) {
+            group.groupMembers.pull(user.id);
+            group.groupMemberCount = group.groupMemberCount - 1;
+            user.groups.pull(group._id);
+
+            await group.save();
+            await user.save();
+        }
+
+        res.status(200).json("Member removed");
+
+    } catch (err) {
+        throw new DbError("Can't remove member")
+    }
+}))
+
+app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
+
+    const { groupid } = req.body;
+
+    try {
+        const group = await GroupModel.findOne({ _id: groupid })
+
+        for (let i = 0; i < group.groupMembers.length; i++) {
+            const user = await UserModel.findOne({ id: group.groupMembers[i] })
+            console.log("user: ", user);
+            user.groups.pull(group._id);
+            await user.save();
+            console.log("after remove group: ", user);
+        }
+
+        await GroupModel.deleteOne({ _id: groupid })
+
+        res.status(200).json({ message: "group Deleted" });
+
+    } catch (err) {
+        throw new DbError("Can't delete group")
+    }
+}))
+
+app.post("/api/getUserId", asyncWrapper(async (req, res) => {
+
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Get User Account id
+    const userId = user.id;
+
+    // Send response
+    res.status(200).json(userId)
+}))
+
+app.post("/api/sendInvite", asyncWrapper(async (req, res) => {
+
+    // Get Request body
+    const { username, groupId, token } = req.body;
+
+    // Find User
+    const user = await UserModel.findOne({ username: username }).catch(err => {
+        console.log("No user")
+    })
+
+    // Find group owner
+    const owner = await UserModel.findOne({ token: token})
+
+    // Find group
+    const group = await GroupModel.findOne({ _id: groupId})
+
+    console.log(username);
+    console.log(groupId);
+    console.log(user);
+
+    // Send Invite
+    if (user != undefined && user != null && !user.invites.includes(groupId) && !user.groups.includes(groupId)
+        && group.groupOwnerId.includes(owner.id)) {
+        user.invites.push(groupId)
+        await user.save();
+    }
+
+    //Send response
+    res.status(200).json("Invite sent");
+
+}))
+
+app.post("/api/getInvites", asyncWrapper(async (req, res) => {
+
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Get invites
+    const invites = user.invites;
+
+    //Get groups from invites
+    const groups = [];
+    for (let i = 0; i < invites.length; i++) {
+        console.log(invites[i]);
+        const group = await GroupModel.findOne({ _id: invites[i] })
+        console.log('group: ', group);
+        groups.push(group);
+    }
+
+    // Send response
+    res.status(200).json(groups)
+}))
+
+app.post('/api/declineInvite', asyncWrapper(async (req, res) => {
+
+    const { groupid, token } = req.body;
+
+    const user = await UserModel.findOne({ token: token })
+
+    if (user != undefined && user != null && user.invites.includes(groupid)) {
+        user.invites.pull(groupid);
+        await user.save();
+    }
+
+    res.status(200).json("Declined Invite");
+
+}))
+
+// Get User Account details
+app.post("/api/account/get", asyncWrapper(async (req, res) => {
+    console.log(req.body)
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    console.log(user)
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Get User Account details
+    const groupsJoined = user.groups.length
+    const accountDeletionDate = user.accountDeletionDate == null ? "Not Scheduled" : user.accountDeletionDate
+    const displayName = user.displayName
+
+    // Send response
+    res.status(200).json({ groupsJoined, accountDeletionDate, displayName })
+}))
+
+// Delete User Account
+app.post("/api/account/delete", asyncWrapper(async (req, res) => {
+    // Get Request body
+    const { token } = req.body;
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Remove User from Groups
+    const groupids = user.groups;
+    console.log("groupids: ", groupids);
+
+    for (let i = 0; i < groupids.length; i++) {
+        const group = await GroupModel.findOne({ _id: groupids[i] })
+        console.log("<1>");
+        // Delete groups if User is owner
+        if( group.groupOwnerId.includes(user.id)){
+            console.log("<2>");
+
+            for (let i = 0; i < group.groupMembers.length; i++) {
+                const member = await UserModel.findOne({ id: group.groupMembers[i] })
+                console.log("<3>");
+
+                //console.log("user: ", member);
+                member.groups.pull(group._id);
+                await member.save();
+                //console.log("after remove group: ", member);
+            }
+            console.log("<4>");
+
+            await GroupModel.deleteOne(group)
+
+            console.log("<5>");
+
+    
+        } else {
+            group.groupMember.pull(user);
+            group.groupMemberCount = group.groupMemberCount - 1;
+        }
+    }
+
+    // Delete User Account
+    await UserModel.deleteOne({ token: token })
+    res.status(200).json({ message: "Account Deleted" })
+}))
+
+app.put("/api/account/update/displayname", asyncWrapper(async (req, res) => {
+    // Get Request body
+    const { token, displayName } = req.body;
+    console.log(req.body)
+
+    // Validate User input
+    if (!token) throw Error("All inputs are required")
+
+    // Find User
+    const user = await UserModel.findOne({ token: token })
+    if (!user) {
+        throw new Error("User does not exist")
+    }
+
+    // Update User Account
+    user.displayName = displayName
+    await user.save()
+    res.status(200).json({ message: user.displayName })
+}));
+
 
 // Catch all other routes
 app.get('*', asyncWrapper(async (req, res) => {
