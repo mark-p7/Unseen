@@ -10,6 +10,9 @@ const Message = new mongoose.Schema({
     user: {
         type: String // User id
     },
+    group: {
+        type: String // Group id
+    },
     content: {
         default: "", // Should be encrypted
         type: String
