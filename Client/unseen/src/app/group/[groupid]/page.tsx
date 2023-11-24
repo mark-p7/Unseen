@@ -98,21 +98,27 @@ export default function Home() {
         });
     }
 
+    const goToChat = () => {
+        router.push(`/group-chat/${params.groupid}`)
+    }
+
 
     const renderTable = () => {
         return members.map(member => {
             return (
                 <TableRow key={member.id}>
                     <TableCell className="font-medium">{member.username}</TableCell>
+                    <TableCell><Button onClick={() => goToChat()}>Join chat</Button></TableCell>
                     <TableCell><Button onClick={() => removeFromGroup(member.id)}>Remove from group</Button></TableCell>
                     <TableCell><Button onClick={() => leaveGroup()}>Leave group</Button></TableCell>
+
                 </TableRow>
             )
         })
     }
 
     const ModalContent = () => {
-    
+
         const sendInvite = async() => {
             await axios.post('/sendInvite', {
                 username: username, groupId: params.groupid, token: localStorage.getItem('auth-token')
@@ -122,7 +128,7 @@ export default function Home() {
                 console.log(err);
             });
         }
-    
+
         return (
           <div className="flex flex-col gap-4 p-11">
             <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Username" onChange={event => setUsername(event.target.value)} />
@@ -147,6 +153,7 @@ export default function Home() {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-[100px]">Members</TableHead>
+                        <TableHead className="w-[100px]">Join chat</TableHead>
                         <TableHead className="w-[100px]">Remove member</TableHead>
                         <TableHead className="w-[100px]">Leave group</TableHead>
                     </TableRow>
