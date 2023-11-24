@@ -3,6 +3,7 @@ import * as socketIO from "socket.io-client";
 import { Context } from "@/context/userContext";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from 'axios';
 
 interface IMessage {
     text: string;
