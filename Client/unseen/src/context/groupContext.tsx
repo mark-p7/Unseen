@@ -31,7 +31,7 @@ export default function GroupProvider( {children,}: { children: React.ReactNode;
     const [myGroups, setMyGroups] = useState<IGroup[]>([]);
 
     useEffect(() => {
-        fetchGroupsfromServer();
+        // fetchGroupsfromServer();
         fetchMyGroups();
     }, []);
 
@@ -39,11 +39,12 @@ export default function GroupProvider( {children,}: { children: React.ReactNode;
         updateMyGroups();
     }, [myGroups]);
 
-    async function fetchGroupsfromServer(): Promise<void> {
-        const response = await fetch("https://localhost:8080/" + "group-chat");
-        const groups = await response.json();
-        setGroups(groups);
-    }
+    // async function fetchGroupsfromServer(): Promise<void> {
+    //     const response = await fetch("https://localhost:8080/" + "group-chat");
+    //     const groups = await response.json();
+    //     setGroups(groups);
+    // }
+
 
     function fetchMyGroups() {
         const myGroups = localStorage.getItem("myGroups");
