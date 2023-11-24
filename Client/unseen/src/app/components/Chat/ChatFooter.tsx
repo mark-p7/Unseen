@@ -5,6 +5,8 @@ import { AiFillPlusCircle, AiFillLike } from "react-icons/ai";
 import { BsImage, BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend, IoMdCloseCircle } from "react-icons/io";
 import Picker from "emoji-picker-react";
+import axios from 'axios';
+import {useParams} from "next/navigation";
 
 function Toast({ message }: { message: string }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -28,6 +30,9 @@ function ChatFooter({ groupId }: { groupId: string }) {
   const [image, setImage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState<boolean>(false)
   const [toastMessage, setToastMessage] = useState<string>("")
+  const params = useParams();
+
+  axios.defaults.baseURL = 'https://localhost:8080/api';
 
   const onEmojiPick = (emojiObj: any) => {
     setMessage((prevInput) => prevInput + emojiObj.emoji);
@@ -35,17 +40,24 @@ function ChatFooter({ groupId }: { groupId: string }) {
     setShowEmojiPicker(false);
   };
 
-  const handleSendMessage = (e: any, message: string) => {
+  const handleSendMessage = async (e: any, message: string) => {
     e.preventDefault();
+    const datePosted = new Date();
     if (message.trim() || image) {
+      await axios.post('/message/create', {
+        groupId: groupId,
+        datePosted: datePosted,
+        content: message,
+        token: localStorage.getItem('auth-token')
+      })
       socket?.emit("send-message", {
         text: message,
         name: userStatus.username,
-        time: new Date(),
+        time: datePosted,
         socketId: socket.id,
         groupId: groupId,
         image,
-      });
+      })
     }
     setMessage("");
     setImage(null);
