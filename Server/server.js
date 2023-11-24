@@ -525,6 +525,50 @@ app.post('/api/declineInvite', asyncWrapper(async (req, res) => {
 
 }))
 
+//---------------------------- Message routes --------------------------------------------------------------------------
+
+app.post("/api/message/create",  asyncWrapper(async (req, res) => {
+    // Obtaining body parameters
+    const { groupId, datePosted, content, token } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ token: token })
+
+        const message = await MessageModel.create({
+            group: groupId,
+            datePosted: datePosted,
+            user: user.id,
+            content: content
+        })
+
+        console.log(message);
+
+        await message.save();
+
+        res.status(200).json(message);
+    } catch (err) {
+        throw new DbError("Cannot create message")
+    }
+}));
+
+app.post("/api/message/getAllFromGroup",  asyncWrapper(async (req, res) => {
+    // Obtaining body parameters
+    const { groupId } = req.body;
+
+    try {
+
+        const messages = await MessageModel.find({group: groupId})
+
+        console.log("messages: ", messages);
+
+        res.status(200).json(messages);
+    } catch (err) {
+        throw new DbError(err)
+    }
+}));
+
+// ------------------------ End of message routes -----------------------------------------------
+
 // Get User Account details
 app.post("/api/account/get", asyncWrapper(async (req, res) => {
     console.log(req.body)
@@ -590,7 +634,7 @@ app.post("/api/account/delete", asyncWrapper(async (req, res) => {
 
             console.log("<5>");
 
-    
+
         } else {
             group.groupMember.pull(user);
             group.groupMemberCount = group.groupMemberCount - 1;
