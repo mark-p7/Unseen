@@ -1,11 +1,24 @@
 "use client";
 import { useSocket } from "@/context/socketContext";
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 function ChatBody({ groupId }: { groupId: string }) {
   const [typing, setTyping] = useState<string>("");
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const { messages, socket } = useSocket();
+
+
+  useEffect(() => {
+    const getMessages = async () => {
+      await axios.post('/message/getAllFromGroup', {
+        groupId: groupId,
+      })
+    }
+    getMessages().then(res => {
+
+    })
+  }, [])
 
   useEffect(() => {
     lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,7 +51,7 @@ function ChatBody({ groupId }: { groupId: string }) {
             </div>
             <div>
               <p className="pl-2 text-sm align-bottom">{message.name}</p>
-              {message.text && <div className={`px-3 py-1 bg-gray-200 rounded-full ${message.image ? "rounded-bl-none" : "rounded-tl-none"} w-fit`}>
+              {message.text && <div className={`px-3 py-1 bg-blue-900 rounded-full ${message.image ? "rounded-bl-none" : "rounded-tl-none"} w-fit`}>
                 <p className="font-sans">{message.text}</p>
               </div>}
               <p className="py-2 pl-2 text-xs font-light">
