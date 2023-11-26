@@ -21,7 +21,7 @@ function ChatBody({ groupId }: { groupId: string }) {
   const [isMessageDeleteModalOpen, setIsMessageDeleteModalOpen] = useState<boolean>(false);
   const [username, setUsername] = useState("");
   const [groupMembers, setGroupMembers] = useState([""]);
-  const [groupName, setGroupName] = useState(groupId);
+  const [groupName, setGroupName] = useState("Group Name");
   const [deleteTime, setDeleteTime] = useState<number>(0);
   const [isGroupOwner, setIsGroupOwner] = useState<boolean>(false);
 
@@ -193,7 +193,7 @@ function ChatBody({ groupId }: { groupId: string }) {
   return (
     <div className="basis-[85%] p-5 overflow-y-scroll flex flex-cols-2 gap-2">
       <div className="flex flex-col w-1/4 border">
-        <h1 className="font-bold text-xl underline">{groupName}</h1>
+        <h1 className="font-bold text-xl underline overflow-x-hidden">{groupName}</h1>
         <ul>
           <li><Modal
             title="Send Invite"
@@ -216,7 +216,7 @@ function ChatBody({ groupId }: { groupId: string }) {
             isOpen={isDisplayMembersModalOpen}
             setIsOpen={setIsDisplayMembersModalOpen}
           /></li>
-          <li className="pt-4 cursor-pointer" onClick={deleteGroup}>Delete Group</li>
+          <li className="pt-4 cursor-pointer sm-justify-self-center" onClick={deleteGroup}>Delete Group</li>
           <li><Modal
             title="Message Delete Time"
             children={<>{MessageDeleteModalContent()}</>}
