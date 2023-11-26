@@ -240,6 +240,12 @@ function ChatBody({ groupId }: { groupId: string }) {
               {message.content && <div className="flex justify-center bg-blue-500 rounded-full items-center px-3 py-1 text-white rounded-full rounded-br-none bg-primary">
                 <p className="font-sans">{message.content}</p>
               </div>}
+              <p className="py-2 pl-2 text-xs font-light">
+                {new Date(message.datePosted).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
             </div>
           ) : (
             <div className="flex gap-2 self-start" key={index}>
@@ -273,6 +279,12 @@ function ChatBody({ groupId }: { groupId: string }) {
               {message.text && <div className="flex justify-center bg-blue-500 rounded-full items-center px-3 py-1 text-white rounded-full rounded-br-none bg-primary">
                 <p className="font-sans">{message.text}</p>
               </div>}
+              <p className="py-2 pl-2 text-xs font-light">
+                {new Date(message.time).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
             </div>
           ) : (
             <div className="flex gap-2 self-start" key={index}>
