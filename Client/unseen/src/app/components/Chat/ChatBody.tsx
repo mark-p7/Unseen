@@ -237,7 +237,7 @@ function ChatBody({ groupId }: { groupId: string }) {
             </div>
           ) : message.user === userStatus.userId ? (
             <div className="flex self-end flex-col items-end" key={index}>
-              {message.content && <div className="flex justify-center items-center px-3 py-1 text-white rounded-full rounded-br-none bg-primary">
+              {message.content && <div className="flex justify-center bg-blue-500 rounded-full items-center px-3 py-1 text-white rounded-full rounded-br-none bg-primary">
                 <p className="font-sans">{message.content}</p>
               </div>}
             </div>
@@ -270,7 +270,7 @@ function ChatBody({ groupId }: { groupId: string }) {
             </div>
           ) : message.socketId === socket?.id ? (
             <div className="flex self-end flex-col items-end" key={index}>
-              {message.text && <div className="flex justify-center items-center px-3 py-1 text-white rounded-full rounded-br-none bg-primary">
+              {message.text && <div className="flex justify-center bg-blue-500 rounded-full items-center px-3 py-1 text-white rounded-full rounded-br-none bg-primary">
                 <p className="font-sans">{message.text}</p>
               </div>}
             </div>
