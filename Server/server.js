@@ -53,13 +53,13 @@ const io = new Server(server, {
 
 // Socket connection
 
-let groupUsers = {};
+let groupUsers = {}; //a dictionary with key = groupId and value = array of socket ids
 
 io.on("connection", (socket) => {
     io.emit("users-response", groupUsers);
     console.log("a user connected");
 
-    socket.on("join-group", (groupId) => {
+    socket.on("enter-group", (groupId) => {
         socket.join(groupId);
         groupUsers = {
             ...groupUsers,
