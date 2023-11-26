@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import React, { useContext, useEffect } from "react";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import axios from 'axios';
+import { useRouter } from "next/navigation";
 
 
 interface PageParams extends Params {
@@ -19,15 +20,32 @@ function Page() {
   const { socket, groupUsers } = useSocket();
   const { userStatus, setUserStatus } = useContext(Context);
   axios.defaults.baseURL = 'https://localhost:8080/api';
+  const router = useRouter()
 
   useEffect(() => {
     if (groupUsers[groupId]?.includes(socket?.id)) return;
+
+    axios.post('/getGroup', {
+      groupid: groupId
+    }).then(res => {
+      const groupMembers = res.data.groupMembers;
+      axios.post('/getUserId', {
+        token: localStorage.getItem('auth-token')
+      }).then(res => {
+        const userId = res.data;
+        if (!groupMembers.includes(userId))
+          router.push('/groups');
+      })
+    }).catch(err => {
+      router.push('/groups');
+    });
+
     socket?.emit("send-message", {
       text: userStatus.username + " joined the group.",
       socketId: "abcd",
       groupId: groupId,
     });
-    socket?.emit("join-group", groupId);
+    socket?.emit("enter-group", groupId);
     console.log("printing socket")
     console.log(socket);
     console.log("printing group users")

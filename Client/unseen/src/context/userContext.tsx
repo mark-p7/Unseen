@@ -5,6 +5,7 @@ import axios from 'axios';
 interface UserStatus {
     username: string | null;
     loggedIn: boolean | null;
+    userId: string | null;
     privateKey: string | null;
     publicKey: string | null;
     authToken: string | null;
@@ -29,6 +30,7 @@ export const ContextProvider = ({ children }: any) => {
                     setUserStatus({
                         username: response.data.username,
                         loggedIn: response.data.token.length > 0 ? true : false,
+                        userId: response.data.id,
                         privateKey: localStorage.getItem('privateKey') ? localStorage.getItem('privateKey') : null,
                         publicKey: localStorage.getItem('publicKey') ? localStorage.getItem('publicKey') : null,
                         authToken: localStorage.getItem('auth-token') ? localStorage.getItem('auth-token') : null
@@ -38,6 +40,7 @@ export const ContextProvider = ({ children }: any) => {
                     setUserStatus({
                         username: null,
                         loggedIn: false,
+                        userId: null,
                         privateKey: localStorage.getItem('privateKey') ? localStorage.getItem('privateKey') : null,
                         publicKey: localStorage.getItem('publicKey') ? localStorage.getItem('publicKey') : null,
                         authToken: null
