@@ -298,7 +298,7 @@ app.post('/api/getGroup', asyncWrapper(async (req, res) => {
         const group = await GroupModel.findOne({ _id: groupid })
         //console.log("<1>");
         //console.log(group);
-        res.json(group.groupName);
+        res.json(group);
 
     } catch (err) {
         throw new DbError("Can't get group")
@@ -422,7 +422,7 @@ app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
             }
     
             await GroupModel.deleteOne({ _id: groupid })
-            
+
         }
 
         res.status(200).json({ message: "group Deleted" });
