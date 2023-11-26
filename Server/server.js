@@ -298,7 +298,7 @@ app.post('/api/getGroup', asyncWrapper(async (req, res) => {
         const group = await GroupModel.findOne({ _id: groupid })
         //console.log("<1>");
         //console.log(group);
-        res.json(group);
+        res.json(group.groupName);
 
     } catch (err) {
         throw new DbError("Can't get group")
@@ -307,14 +307,16 @@ app.post('/api/getGroup', asyncWrapper(async (req, res) => {
 
 app.post('/api/getGroupMembers', asyncWrapper(async (req, res) => {
 
-    const { memberids } = req.body;
-    console.log("member ids: ", memberids);
+    const { groupid } = req.body;
+    console.log("group id: ", groupid);
 
     try {
+        const group = await GroupModel.findOne({ _id: groupid })
+
         const members = [];
-        for (let i = 0; i < memberids.length; i++) {
-            const user = await UserModel.findOne({ id: memberids[i] })
-            members.push(user);
+        for (let i = 0; i < group.groupMemberCount; i++) {
+            const user = await UserModel.findOne({ id: group.groupMembers[i] })
+            members.push(user.displayName);
         }
         console.log('members: ', members);
         res.json(members);
@@ -403,20 +405,25 @@ app.post('/api/removeMember', asyncWrapper(async (req, res) => {
 
 app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
 
-    const { groupid } = req.body;
+    const { groupid, token } = req.body;
 
     try {
+        const user = await UserModel.findOne({ token: token })
         const group = await GroupModel.findOne({ _id: groupid })
 
-        for (let i = 0; i < group.groupMembers.length; i++) {
-            const user = await UserModel.findOne({ id: group.groupMembers[i] })
-            console.log("user: ", user);
-            user.groups.pull(group._id);
-            await user.save();
-            console.log("after remove group: ", user);
-        }
+        if(group.groupOwnerId.includes(user.id)){
 
-        await GroupModel.deleteOne({ _id: groupid })
+            for (let i = 0; i < group.groupMembers.length; i++) {
+                const user = await UserModel.findOne({ id: group.groupMembers[i] })
+                console.log("user: ", user);
+                user.groups.pull(group._id);
+                await user.save();
+                console.log("after remove group: ", user);
+            }
+    
+            await GroupModel.deleteOne({ _id: groupid })
+            
+        }
 
         res.status(200).json({ message: "group Deleted" });
 
@@ -522,6 +529,22 @@ app.post('/api/declineInvite', asyncWrapper(async (req, res) => {
     }
 
     res.status(200).json("Declined Invite");
+
+}))
+
+app.post('/api/setMsgDeleteTime', asyncWrapper(async (req, res) => {
+
+    const { groupid, token, deleteTime } = req.body;
+
+    const group = await GroupModel.findOne({ _id: groupid })
+    const user = await UserModel.findOne({ token: token })
+
+    if (user != undefined && user != null && group.groupOwnerId.includes(user.id)) {
+        group.messageDeleteTime = deleteTime;
+        await group.save();
+    }
+
+    res.status(200).json("Message delete time set");
 
 }))
 

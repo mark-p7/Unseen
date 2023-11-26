@@ -52,16 +52,11 @@ export default function Home() {
         }).then(res => { const nextInvites = res.data; setInvites(nextInvites); console.log(nextInvites); });
     }, [])
 
-
-    const navigateToCreateGroup = () => {
-        router.push('/create-group');
-    }
-
     const renderCards = () => {
         return groups.map(group => {
             if (group != null) {
                 return (
-                    <Link href={`/group/${group._id}`} key={group._id} className="rounded shadow-lg border-2 border-white rounded-b p-10 pb-20 flex flex-col">
+                    <Link href={`/group-chat/${group._id}`} key={group._id} className="rounded shadow-lg border-2 border-white rounded-b p-10 pb-20 flex flex-col">
                         <div className="font-bold mb-2">{group.groupName}</div>
                         <p className="text-gray-300 text-base ">
                             members: {group.groupMemberCount}
@@ -105,9 +100,13 @@ export default function Home() {
         })
     }
 
-    const ModalContent = () => {
+    const createGroupHandler =async () => {
+        if (!groupName.toString().trim().length) {
+            return 'require';
+          }
+    }
 
-        const [tempGroups, setTempGroups] = useState([groupModel]);
+    const ModalContent = () => {
 
         const createGroup = async () => {
             await axios.post('/createGroup', {
@@ -130,7 +129,7 @@ export default function Home() {
 
         return (
             <div className="flex flex-col gap-4 p-11">
-                <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Group Name"
+                <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Group Name" required min={1} max={15}
                     onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setGroupName(event.target.value)} autoFocus />
                 <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => createGroup()}>Create Group</Button>
             </div>

@@ -5,10 +5,10 @@ import ChatHeader from "@/app/components/Chat/ChatHeader";
 import { useSocket } from "@/context/socketContext";
 import { Context } from "@/context/userContext";
 import { useParams } from "next/navigation";
-import React, {useContext, useEffect} from "react";
-import {Params} from "next/dist/shared/lib/router/utils/route-matcher";
+import React, { useContext, useEffect } from "react";
+import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import axios from 'axios';
-import {Button} from "@/app/components/ui/button";
+
 
 interface PageParams extends Params {
   groupId: string;
@@ -35,12 +35,12 @@ function Page() {
   }, [socket]);
 
 
-    return (
-      <div className="flex relative flex-col w-full h-screen">
+  return (
+    <div className="flex relative flex-col w-full h-screen">
         <ChatHeader groupId={groupId} />
         <ChatBody groupId={groupId} />
         <ChatFooter groupId={groupId} />
-      </div>
+    </div>
   );
 }
 
