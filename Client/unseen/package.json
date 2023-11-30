@@ -38,6 +38,7 @@
     "@types/react-dom": "latest",
     "@types/uuid": "^9.0.7",
     "autoprefixer": "latest",
+    "eslint-plugin-react": "^7.33.2",
     "postcss": "latest",
     "tailwindcss": "latest",
     "typescript": "latest"
