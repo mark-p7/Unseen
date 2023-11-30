@@ -48,6 +48,10 @@ const User = new mongoose.Schema({
     groups: {
         default: [],
         type: [String]
+    },
+    invites: {
+        default: [],
+        type: [String]
     }
 });
 

@@ -5,7 +5,8 @@ module.exports = {
     },
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "overrides": [
         {
@@ -13,7 +14,7 @@ module.exports = {
                 "node": true
             },
             "files": [
-                ".eslintrc.{js,cjs}"
+                ".eslintrc.{js,cjs,tsx,ts}"
             ],
             "parserOptions": {
                 "sourceType": "script"
@@ -28,5 +29,7 @@ module.exports = {
         "react"
     ],
     "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "react/prop-types": "off"
     }
 }

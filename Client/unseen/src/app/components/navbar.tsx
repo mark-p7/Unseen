@@ -1,8 +1,9 @@
 "use client"
 import Image from "next/image"
+import React from "react"
 
 export interface NavbarProps {
-    isLoggedIn: Boolean;
+    isLoggedIn: boolean;
 }
 
 export const Navbar = ({ isLoggedIn }: NavbarProps) => {
