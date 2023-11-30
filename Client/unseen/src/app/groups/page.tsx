@@ -1,29 +1,21 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from 'axios';
 import { Context } from "@/context/userContext";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import { Button } from "@/app/components/ui/button";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/app/components/ui/table"
 import { Modal } from "@/app/components/modal";
 import { Input } from "@/app/components/ui/input";
 import { Navbar } from "@/app/components/navbar";
 
 
 export default function Home() {
-    const { userStatus, setUserStatus } = useContext(Context);
+    const { userStatus } = useContext(Context);
     const router = useRouter()
-    var groupModel = { groupName: 'loading...', groupMemberCount: 'loading...', _id: '' }
+    const groupModel = { groupName: 'loading...', groupMemberCount: 'loading...', _id: '' }
     const [groups, setGroups] = useState([groupModel])
-    const [invites, setInvites] = useState([{ groupName: "", _id: "" }])
+    // const [invites, setInvites] = useState([{ groupName: "", _id: "" }])
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false);
     const [groupName, setGroupName] = useState("");
 
@@ -46,11 +38,11 @@ export default function Home() {
         });
     }, [])
 
-    useEffect(() => {
-        axios.post('/getInvites', {
-            token: localStorage.getItem('auth-token')
-        }).then(res => { const nextInvites = res.data; setInvites(nextInvites); console.log(nextInvites); });
-    }, [])
+    // useEffect(() => {
+    //     axios.post('/getInvites', {
+    //         token: localStorage.getItem('auth-token')
+    //     }).then(res => { const nextInvites = res.data; setInvites(nextInvites); console.log(nextInvites); });
+    // }, [])
 
     const renderCards = () => {
         return groups.map(group => {
@@ -67,44 +59,44 @@ export default function Home() {
         })
     }
 
-    const renderTable = () => {
-        return invites.map(invite => {
+    // const renderTable = () => {
+    //     return invites.map(invite => {
+    //
+    //         const joinGroup = async () => {
+    //             await axios.post('/joinGroup', {
+    //                 groupid: invite._id, token: localStorage.getItem('auth-token')
+    //             }).then(res => {
+    //                 console.log(res); router.push(`/groups/${invite._id}`);
+    //             }).catch(err => {
+    //                 console.log(err);
+    //             });
+    //         }
+    //
+    //         const declineInvite = async () => {
+    //             await axios.post('/declineInvite', {
+    //                 groupid: invite._id, token: localStorage.getItem('auth-token')
+    //             }).then(res => {
+    //                 console.log(res); router.replace('/groups');
+    //             }).catch(err => {
+    //                 console.log(err);
+    //             });
+    //         }
+    //
+    //         return (
+    //             <TableRow key={invite.groupName}>
+    //                 <TableCell className="font-medium">{invite.groupName}</TableCell>
+    //                 <TableCell className="font-medium"><Button onClick={() => joinGroup()}>Accept</Button></TableCell>
+    //                 <TableCell className="font-medium"><Button onClick={() => declineInvite()}>Decline</Button></TableCell>
+    //             </TableRow>
+    //         )
+    //     })
+    // }
 
-            const joinGroup = async () => {
-                await axios.post('/joinGroup', {
-                    groupid: invite._id, token: localStorage.getItem('auth-token')
-                }).then(res => {
-                    console.log(res); router.push(`/groups/${invite._id}`);
-                }).catch(err => {
-                    console.log(err);
-                });
-            }
-
-            const declineInvite = async () => {
-                await axios.post('/declineInvite', {
-                    groupid: invite._id, token: localStorage.getItem('auth-token')
-                }).then(res => {
-                    console.log(res); router.replace('/groups');
-                }).catch(err => {
-                    console.log(err);
-                });
-            }
-
-            return (
-                <TableRow key={invite.groupName}>
-                    <TableCell className="font-medium">{invite.groupName}</TableCell>
-                    <TableCell className="font-medium"><Button onClick={() => joinGroup()}>Accept</Button></TableCell>
-                    <TableCell className="font-medium"><Button onClick={() => declineInvite()}>Decline</Button></TableCell>
-                </TableRow>
-            )
-        })
-    }
-
-    const createGroupHandler =async () => {
-        if (!groupName.toString().trim().length) {
-            return 'require';
-          }
-    }
+    // const createGroupHandler =async () => {
+    //     if (!groupName.toString().trim().length) {
+    //         return 'require';
+    //       }
+    // }
 
     const ModalContent = () => {
 
@@ -121,7 +113,7 @@ export default function Home() {
             });
         }
 
-        const onKeyDownHandler = (key: String) => {
+        const onKeyDownHandler = (key: string) => {
             if (key === 'Enter') {
                 createGroup();
             }
@@ -173,11 +165,13 @@ export default function Home() {
                     <div className="w-1/3">
                         <Modal
                             title="Create Group"
-                            children={<>{ModalContent()}</>}
+                            // children={<>{ModalContent()}</>}
                             triggerText="Create Group"
                             isOpen={isCreateGroupModalOpen}
                             setIsOpen={setIsCreateGroupModalOpen}
-                        />
+                        >
+                            <ModalContent></ModalContent>
+                        </Modal>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 justify-center content-center m-20">{renderCards()}</div>
                 </div>

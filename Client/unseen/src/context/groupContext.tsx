@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface IGroup {
     title: string;
@@ -27,7 +27,7 @@ export function useGroup() {
 
 export default function GroupProvider( {children,}: { children: React.ReactNode; } )
 {
-    const [groups, setGroups] = useState<IGroup[]>([]);
+    const [groups] = useState<IGroup[]>([]);
     const [myGroups, setMyGroups] = useState<IGroup[]>([]);
 
     useEffect(() => {

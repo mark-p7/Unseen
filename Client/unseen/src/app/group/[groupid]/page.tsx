@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from 'axios';
 import { Context } from "@/context/userContext";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ import { Input } from "@/app/components/ui/input";
 
 
 export default function Home() {
-    const { userStatus, setUserStatus } = useContext(Context);
+    const { userStatus } = useContext(Context);
     const router = useRouter()
     const params = useParams()
     const [isChangeDisplayNameModalOpen, setIsChangeDisplayNameModalOpen] = useState<boolean>(false);
@@ -33,8 +33,8 @@ export default function Home() {
         }
     }, [userStatus]);
 
-    var groupModel = { groupName: '', groupMemberCount: '', _id: '', groupMembers: [] }
-    var userModel = { username: '', id: '' }
+    const groupModel = { groupName: '', groupMemberCount: '', _id: '', groupMembers: [] }
+    const userModel = { username: '', id: '' }
 
     const [group, setGroup] = useState(groupModel)
     const [members, setMembers] = useState([userModel])
@@ -78,10 +78,10 @@ export default function Home() {
         })
     }
 
-    const removeFromGroup = async (userid: String) => {
+    const removeFromGroup = async (userid: string) => {
         await axios.post('/removeMember', {
             groupid: params.groupid, userid: userid
-        }).then(res => {
+        }).then(() => {
             router.push(`/group/${group._id}`);
         }).catch(err => {
             console.log(err);
@@ -144,11 +144,13 @@ export default function Home() {
             <div><Button onClick={deleteGroup}>Delete group</Button></div>
             <Modal
                 title="Send Invite"
-                children={<>{ModalContent()}</>}
+                // children={<>{ModalContent()}</>}
                 triggerText="Send Invite"
                 isOpen={isChangeDisplayNameModalOpen}
                 setIsOpen={setIsChangeDisplayNameModalOpen}
-              />
+              >
+                <ModalContent></ModalContent>
+            </Modal>
             <Table>
                 <TableHeader>
                     <TableRow>

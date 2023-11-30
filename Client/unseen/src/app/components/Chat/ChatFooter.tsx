@@ -6,10 +6,9 @@ import { BsImage, BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend, IoMdCloseCircle } from "react-icons/io";
 import Picker from "emoji-picker-react";
 import axios from 'axios';
-import {useParams} from "next/navigation";
 
 function Toast({ message }: { message: string }) {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible] = useState(true);
   return (
       <div className='flex justify-center mb-1 fixed bottom-14 sm:bottom-16 left-1/2'>
         {isVisible && (
@@ -23,14 +22,14 @@ function Toast({ message }: { message: string }) {
 function ChatFooter({ groupId }: { groupId: string }) {
   const [message, setMessage] = useState<string>("");
   const { socket } = useSocket();
-  const { userStatus, setUserStatus } = useContext(Context);
+  const { userStatus } = useContext(Context);
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
   const inputRef = useRef<any | null>(null);
   const fileRef = useRef<any | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState<boolean>(false)
   const [toastMessage, setToastMessage] = useState<string>("")
-  const params = useParams();
+  // const params = useParams();
 
   axios.defaults.baseURL = 'https://localhost:8080/api';
 
@@ -75,7 +74,7 @@ function ChatFooter({ groupId }: { groupId: string }) {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 1500)
       return true
-    };
+    }
     return false
   };
 

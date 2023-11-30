@@ -3,7 +3,6 @@ import * as socketIO from "socket.io-client";
 import { Context } from "@/context/userContext";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from 'axios';
 
 interface IMessage {
     text: string;
@@ -33,7 +32,7 @@ export function useSocket() {
 }
 
 export default function SocketProvider({ children,}: { children: React.ReactNode; }) {
-    const { userStatus, setUserStatus } = useContext(Context);
+    const { userStatus } = useContext(Context);
     const [groupUsers, setGroupUsers] = useState({});
     const [socket, setSocket] = useState<socketIO.Socket>();
     const [messages, setMessages] = useState<{ [key: string]: IMessage[] }>({});
@@ -45,7 +44,7 @@ export default function SocketProvider({ children,}: { children: React.ReactNode
             router.replace("/");
             return;
         }
-        let socket = socketIO.connect("https://localhost:8080/");
+        const socket = socketIO.connect("https://localhost:8080/");
         socket.on("receive-message", (data: IMessage) => {
             console.log(data);
             setMessages((prev) => {

@@ -23,7 +23,7 @@ function ChatBody({ groupId }: { groupId: string }) {
   const [groupMembers, setGroupMembers] = useState([""]);
   const [groupName, setGroupName] = useState("Group Name");
   const [deleteTime, setDeleteTime] = useState<number>(0);
-  const [isGroupOwner, setIsGroupOwner] = useState<boolean>(false);
+  // const [isGroupOwner, setIsGroupOwner] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -78,7 +78,7 @@ function ChatBody({ groupId }: { groupId: string }) {
       });
     }
 
-    const onKeyDownHandler = (key: String) => {
+    const onKeyDownHandler = (key: string) => {
       if (key === 'Enter') {
         sendInvite();
       }
@@ -106,7 +106,7 @@ function ChatBody({ groupId }: { groupId: string }) {
       })
     }
 
-    const onKeyDownHandler = (key: String) => {
+    const onKeyDownHandler = (key: string) => {
       if (key === 'Enter') {
         removeFromGroup();
       }
@@ -138,8 +138,8 @@ function ChatBody({ groupId }: { groupId: string }) {
       getGroupMembers;
       return groupMembers.map(function (displayName) {
         return (
-          <ul>
-            <li>{displayName}</li>
+          <ul key={displayName}>
+            <li >{displayName}</li>
           </ul>
         )
       })
@@ -175,7 +175,7 @@ function ChatBody({ groupId }: { groupId: string }) {
       })
     }
 
-    const onKeyDownHandler = (key: String) => {
+    const onKeyDownHandler = (key: string) => {
       if (key === 'Enter') {
         setMsgDeleteTime();
       }
@@ -197,33 +197,43 @@ function ChatBody({ groupId }: { groupId: string }) {
         <ul>
           <li><Modal
             title="Send Invite"
-            children={<>{InviteModalContent()}</>}
+            // children={<>{InviteModalContent()}</>}
             triggerText="Add Member"
             isOpen={isSendInviteModalOpen}
             setIsOpen={setIsSendInviteModalOpen}
-          /></li>
+          >
+            <InviteModalContent></InviteModalContent>
+          </Modal>
+        </li>
           <li><Modal
             title="Remove Member"
-            children={<>{RemoveModalContent()}</>}
+            // children={<>{RemoveModalContent()}</>}
             triggerText="Remove Member"
             isOpen={isRemoveMemberModalOpen}
             setIsOpen={setIsRemoveMemberModalOpen}
-          /></li>
+          >
+            <RemoveModalContent></RemoveModalContent>
+          </Modal>
+          </li>
           <li><Modal
             title="Members"
-            children={<>{MembersModalContent()}</>}
+            // children={<>{MembersModalContent()}</>}
             triggerText="List of Members"
             isOpen={isDisplayMembersModalOpen}
             setIsOpen={setIsDisplayMembersModalOpen}
-          /></li>
+          >
+            <MembersModalContent></MembersModalContent>
+          </Modal></li>
           <li className="pt-4 cursor-pointer sm-justify-self-center" onClick={deleteGroup}>Delete Group</li>
           <li><Modal
             title="Message Delete Time"
-            children={<>{MessageDeleteModalContent()}</>}
+            // children={<>{MessageDeleteModalContent()}</>}
             triggerText="Messages delete time"
             isOpen={isMessageDeleteModalOpen}
             setIsOpen={setIsMessageDeleteModalOpen}
-          /></li>
+          >
+            <MessageDeleteModalContent></MessageDeleteModalContent>
+          </Modal></li>
         </ul>
       </div>
       <div className="flex flex-col w-full overflow-y-scroll">

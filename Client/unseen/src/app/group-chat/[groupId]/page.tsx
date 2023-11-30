@@ -18,7 +18,7 @@ interface PageParams extends Params {
 function Page() {
   const { groupId } = useParams<PageParams>();
   const { socket, groupUsers } = useSocket();
-  const { userStatus, setUserStatus } = useContext(Context);
+  const { userStatus } = useContext(Context);
   axios.defaults.baseURL = 'https://localhost:8080/api';
   const router = useRouter()
 
@@ -36,7 +36,7 @@ function Page() {
         if (!groupMembers.includes(userId))
           router.push('/groups');
       })
-    }).catch(err => {
+    }).catch(() => {
       router.push('/groups');
     });
 
