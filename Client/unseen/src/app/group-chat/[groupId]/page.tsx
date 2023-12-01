@@ -40,26 +40,32 @@ function Page() {
       router.push('/groups');
     });
 
-    socket?.emit("send-message", {
-      text: userStatus.username + " joined the group.",
-      socketId: "abcd",
-      groupId: groupId,
-    });
+    if (userStatus) {
+      socket?.emit("send-message", {
+        text: userStatus.username + " joined the group.",
+        socketId: "abcd",
+        groupId: groupId,
+      });
+    }
+
     socket?.emit("enter-group", groupId);
     console.log("printing socket")
     console.log(socket);
     console.log("printing group users")
     console.log(groupUsers)
-  }, [socket]);
+  }, [socket, userStatus]);
 
 
-  return (
-    <div className="flex relative flex-col w-full h-screen">
+  if (userStatus) {
+    return (
+      <div className="flex relative flex-col w-full h-screen">
         <ChatHeader groupId={groupId} />
         <ChatBody groupId={groupId} />
         <ChatFooter groupId={groupId} />
-    </div>
-  );
+      </div>
+    );
+  }
+
 }
 
 export default Page;
