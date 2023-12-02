@@ -422,6 +422,7 @@ app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
             }
 
             await GroupModel.deleteOne({ _id: groupid })
+            await MessageModel.deleteMany({ group: groupid})
 
         }
 
@@ -690,9 +691,13 @@ app.post("/api/account/delete", asyncWrapper(async (req, res) => {
                 await member.save();
                 //console.log("after remove group: ", member);
             }
+
+            
+            
             console.log("<4>");
 
             await GroupModel.deleteOne(group)
+            await MessageModel.deleteMany({ group: group._id });
 
             console.log("<5>");
 
