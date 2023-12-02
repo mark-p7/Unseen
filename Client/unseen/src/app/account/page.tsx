@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "@/context/userContext";
 import { redirect } from 'next/navigation';
 import axios from "axios";
@@ -41,7 +41,7 @@ export default function Home() {
   }
 
   const logout = async () => {
-    await axios.post('/logout', { token: userStatus?.authToken }).then(res => {
+    await axios.post('/logout', { token: userStatus?.authToken }).then(() => {
       setUserStatus((prevState: any) => ({ ...prevState, loggedIn: false, username: null, authToken: null }));
       localStorage.removeItem('username');
       localStorage.removeItem('auth-token');
@@ -114,11 +114,13 @@ export default function Home() {
               </span>
               <Modal
                 title="Change Display Name"
-                children={<>{ModalContent()}</>}
+                // children={<>{ModalContent()}</>}
                 triggerText="Change Display Name"
                 isOpen={isChangeDisplayNameModalOpen}
                 setIsOpen={setIsChangeDisplayNameModalOpen}
-              />
+              >
+                <ModalContent></ModalContent>
+              </Modal>
               <h1 className="mt-4 cursor-pointer">Set Auto Account Deletion</h1>
               <h1 className="mt-4 cursor-pointer" onClick={handleLogout}>Logout</h1>
               <h1 className="mt-4 cursor-pointer" onClick={handleDelete}>Delete Account</h1>

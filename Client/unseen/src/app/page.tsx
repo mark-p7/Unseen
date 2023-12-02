@@ -1,6 +1,6 @@
 "use client";
 import { socket } from "@/socket";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "@/context/userContext";
 import { redirect } from 'next/navigation';
 import axios from "axios";
@@ -70,7 +70,7 @@ export default function Home() {
   }
 
   const logout = async () => {
-    await axios.post('/logout', { token: userStatus?.authToken }).then(res => {
+    await axios.post('/logout', { token: userStatus?.authToken }).then(() => {
       setUserStatus((prevState: any) => ({ ...prevState, loggedIn: false, username: null, authToken: null }));
       localStorage.removeItem('username');
       localStorage.removeItem('auth-token');
@@ -83,10 +83,6 @@ export default function Home() {
   const handleLogout = () => {
     console.log("logging out")
     logout();
-  }
-
-  const navigateToGroupChat = () => {
-    router.push('/group-chat');
   }
 
   const [showAddGroupPanel, setShowAddGroupPanel] = useState(false);

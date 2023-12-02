@@ -18,7 +18,7 @@ interface PageParams extends Params {
 function Page() {
   const { groupId } = useParams<PageParams>();
   const { socket, groupUsers } = useSocket();
-  const { userStatus, setUserStatus } = useContext(Context);
+  const { userStatus } = useContext(Context);
   axios.defaults.baseURL = 'https://localhost:8080/api';
   const router = useRouter()
 
@@ -36,30 +36,36 @@ function Page() {
         if (!groupMembers.includes(userId))
           router.push('/groups');
       })
-    }).catch(err => {
+    }).catch(() => {
       router.push('/groups');
     });
 
-    socket?.emit("send-message", {
-      text: userStatus.username + " joined the group.",
-      socketId: "abcd",
-      groupId: groupId,
-    });
+    if (userStatus) {
+      socket?.emit("send-message", {
+        text: userStatus.username + " joined the group.",
+        socketId: "abcd",
+        groupId: groupId,
+      });
+    }
+
     socket?.emit("enter-group", groupId);
     console.log("printing socket")
     console.log(socket);
     console.log("printing group users")
     console.log(groupUsers)
-  }, [socket]);
+  }, [socket, userStatus]);
 
 
-  return (
-    <div className="flex relative flex-col w-full h-screen">
+  if (userStatus) {
+    return (
+      <div className="flex relative flex-col w-full h-screen">
         <ChatHeader groupId={groupId} />
         <ChatBody groupId={groupId} />
         <ChatFooter groupId={groupId} />
-    </div>
-  );
+      </div>
+    );
+  }
+
 }
 
 export default Page;

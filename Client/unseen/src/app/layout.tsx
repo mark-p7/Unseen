@@ -1,7 +1,6 @@
 "use client";
 import { Providers } from './providers'
-import { Context } from '../context/userContext';
-import { useContext } from 'react';
+import React from 'react';
 import "./globals.css";
 
 export default function RootLayout({
