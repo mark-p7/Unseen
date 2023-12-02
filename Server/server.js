@@ -411,7 +411,7 @@ app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
         const user = await UserModel.findOne({ token: token })
         const group = await GroupModel.findOne({ _id: groupid })
 
-        if(group.groupOwnerId.includes(user.id)){
+        if (group.groupOwnerId.includes(user.id)) {
 
             for (let i = 0; i < group.groupMembers.length; i++) {
                 const user = await UserModel.findOne({ id: group.groupMembers[i] })
@@ -420,7 +420,7 @@ app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
                 await user.save();
                 console.log("after remove group: ", user);
             }
-    
+
             await GroupModel.deleteOne({ _id: groupid })
 
         }
@@ -465,10 +465,10 @@ app.post("/api/sendInvite", asyncWrapper(async (req, res) => {
     })
 
     // Find group owner
-    const owner = await UserModel.findOne({ token: token})
+    const owner = await UserModel.findOne({ token: token })
 
     // Find group
-    const group = await GroupModel.findOne({ _id: groupId})
+    const group = await GroupModel.findOne({ _id: groupId })
 
     console.log(username);
     console.log(groupId);
@@ -548,9 +548,26 @@ app.post('/api/setMsgDeleteTime', asyncWrapper(async (req, res) => {
 
 }))
 
+app.post('/api/isGroupOwner', asyncWrapper(async (req, res) => {
+
+    const { groupid, token } = req.body;
+
+    const group = await GroupModel.findOne({ _id: groupid })
+    const user = await UserModel.findOne({ token: token })
+
+    var isGroupOwner = false
+
+    if (user != undefined && user != null && group.groupOwnerId.includes(user.id)) {
+        isGroupOwner = true
+    }
+
+    res.status(200).json(isGroupOwner);
+
+}))
+
 //---------------------------- Message routes --------------------------------------------------------------------------
 
-app.post("/api/message/create",  asyncWrapper(async (req, res) => {
+app.post("/api/message/create", asyncWrapper(async (req, res) => {
     // Obtaining body parameters
     const { groupId, datePosted, content, token } = req.body;
 
@@ -574,13 +591,35 @@ app.post("/api/message/create",  asyncWrapper(async (req, res) => {
     }
 }));
 
-app.post("/api/message/getAllFromGroup",  asyncWrapper(async (req, res) => {
+Date.prototype.addDays=function(d){return new Date(this.valueOf()+864E5*d);};
+
+app.post("/api/message/getAllFromGroup", asyncWrapper(async (req, res) => {
     // Obtaining body parameters
     const { groupId } = req.body;
 
     try {
 
-        const messages = await MessageModel.find({group: groupId})
+        const messages = await MessageModel.find({ group: groupId })
+        const group = await GroupModel.findOne({ _id: groupId })
+
+        for (let i = 0; i < messages.length; i++) {
+            // const date = new Date();
+            // const deleteDate = messages[i].datePosted.getDate() + group.messageDeleteTime;
+            // date.setDate(deleteDate)
+            var deleteDate = new Date();
+            deleteDate = messages[i].datePosted.addDays(group.messageDeleteTime)
+            console.log(deleteDate);
+            var currentDate = new Date();
+            console.log(currentDate)
+
+             if (currentDate > deleteDate) {
+                await MessageModel.deleteOne(messages[i])
+                messages.splice(i, 1)
+                i--
+                console.log("deleted")
+             }
+
+        }
 
         console.log("messages: ", messages);
 
@@ -639,7 +678,7 @@ app.post("/api/account/delete", asyncWrapper(async (req, res) => {
         const group = await GroupModel.findOne({ _id: groupids[i] })
         console.log("<1>");
         // Delete groups if User is owner
-        if( group.groupOwnerId.includes(user.id)){
+        if (group.groupOwnerId.includes(user.id)) {
             console.log("<2>");
 
             for (let i = 0; i < group.groupMembers.length; i++) {
