@@ -8,8 +8,6 @@ import { Button } from "@/app/components/ui/button";
 import { Modal } from "@/app/components/modal";
 import { Input } from "@/app/components/ui/input";
 import { Navbar } from "@/app/components/navbar";
-import { Form } from "../components/ui/form";
-
 
 export default function Home() {
     const { userStatus } = useContext(Context);
