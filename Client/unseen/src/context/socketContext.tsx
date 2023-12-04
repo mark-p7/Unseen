@@ -1,8 +1,6 @@
 "use client";
 import * as socketIO from "socket.io-client";
-import { Context } from "@/context/userContext";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface IMessage {
     text: string;
@@ -32,12 +30,9 @@ export function useSocket() {
 }
 
 export default function SocketProvider({ children,}: { children: React.ReactNode; }) {
-    const { userStatus } = useContext(Context);
     const [groupUsers, setGroupUsers] = useState({});
     const [socket, setSocket] = useState<socketIO.Socket>();
     const [messages, setMessages] = useState<{ [key: string]: IMessage[] }>({});
-
-    const router = useRouter();
 
     useEffect(() => {
         // if (!userStatus.username) {
