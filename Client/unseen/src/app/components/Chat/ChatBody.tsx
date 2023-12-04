@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/app/components/ui/input";
 import { Modal } from "@/app/components/modal";
 import { Button } from "@/app/components/ui/button";
+import { setgroups } from "process";
 
 function ChatBody({ groupId }: { groupId: string }) {
   const router = useRouter()
@@ -23,13 +24,15 @@ function ChatBody({ groupId }: { groupId: string }) {
   const [groupMembers, setGroupMembers] = useState([""]);
   const [groupName, setGroupName] = useState("Group Name");
   const [deleteTime, setDeleteTime] = useState<number>(0);
-  // const [isGroupOwner, setIsGroupOwner] = useState<boolean>(false);
+  const [tempDeleteTime, setTempDeleteTime] = useState<number>(0);
+  const [isGroupOwner, setIsGroupOwner] = useState<boolean>(false);
 
 
   useEffect(() => {
     axios.post('/message/getAllFromGroup', {
       groupId: groupId,
     }).then(res => {
+      console.log("get all data: ", res.data);
       const messagesSortedByDate = res.data.sort((a: { datePosted: string; }, b: { datePosted: string; }) => {
         return Date.parse(a.datePosted) - Date.parse(b.datePosted);
       });
@@ -48,10 +51,20 @@ function ChatBody({ groupId }: { groupId: string }) {
   }, []);
 
   useEffect(() => {
+    axios.post('/isGroupOwner', {
+      groupid: groupId, token: localStorage.getItem('auth-token')
+    }).then(res => {
+      console.log(res.data);
+      setIsGroupOwner(res.data);
+    });
+  }, [])
+
+  useEffect(() => {
     axios.post('/getGroup', {
       groupid: groupId
     }).then(res => {
       console.log(res.data);
+      setDeleteTime(res.data.messageDeleteTime);
       setGroupName(res.data.groupName);
     });
   }, [])
@@ -163,12 +176,12 @@ function ChatBody({ groupId }: { groupId: string }) {
   }
 
   const MessageDeleteModalContent = () => {
-
     const setMsgDeleteTime = async () => {
       await axios.post('/setMsgDeleteTime', {
-        groupid: groupId, token: localStorage.getItem('auth-token'), deleteTime: deleteTime
+        groupid: groupId, token: localStorage.getItem('auth-token'), deleteTime: tempDeleteTime
       }).then(res => {
         console.log(res);
+        setDeleteTime(tempDeleteTime)
         setIsMessageDeleteModalOpen(false);
       }).catch(err => {
         console.log(err);
@@ -184,16 +197,15 @@ function ChatBody({ groupId }: { groupId: string }) {
     return (
       <div className="flex flex-col gap-4 p-11">
         <Input className="border-2 border-black rounded-md px-2 py-1" type="number" placeholder="Days Visible" min='0' required pattern="^[0-9]*$"
-          onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setDeleteTime(Number(event.target.value))} autoFocus />
+          onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setTempDeleteTime(Number(event.target.value))} autoFocus />
         <Button className="border-2 border-black rounded-md px-2 py-1" onClick={setMsgDeleteTime}>Enter</Button>
       </div>
     )
   }
 
-  return (
-    <div className="basis-[85%] p-5 overflow-y-scroll flex flex-cols-2 gap-2">
-      <div className="flex flex-col w-1/4 border">
-        <h1 className="font-bold text-xl underline overflow-x-hidden">{groupName}</h1>
+  const renderGroupTabList = () => {
+    if (isGroupOwner) {
+      return (
         <ul>
           <li><Modal
             title="Send Invite"
@@ -211,30 +223,54 @@ function ChatBody({ groupId }: { groupId: string }) {
             triggerText="Remove Member"
             isOpen={isRemoveMemberModalOpen}
             setIsOpen={setIsRemoveMemberModalOpen}
-          >
+            >
             <RemoveModalContent></RemoveModalContent>
-          </Modal>
-          </li>
+          </Modal></li>
           <li><Modal
             title="Members"
             // children={<>{MembersModalContent()}</>}
             triggerText="List of Members"
             isOpen={isDisplayMembersModalOpen}
             setIsOpen={setIsDisplayMembersModalOpen}
-          >
+            >
             <MembersModalContent></MembersModalContent>
           </Modal></li>
-          <li className="pt-4 cursor-pointer sm-justify-self-center" onClick={deleteGroup}>Delete Group</li>
+          <li className="pt-4 cursor-pointer sm:text-left text-center" onClick={deleteGroup}>Delete Group</li>
           <li><Modal
             title="Message Delete Time"
-            // children={<>{MessageDeleteModalContent()}</>}
-            triggerText="Messages delete time"
+            //children={<>{MessageDeleteModalContent()}</>}
+            triggerText='Message delete time'
             isOpen={isMessageDeleteModalOpen}
             setIsOpen={setIsMessageDeleteModalOpen}
-          >
-            <MessageDeleteModalContent></MessageDeleteModalContent>
-          </Modal></li>
+            >
+              <MessageDeleteModalContent></MessageDeleteModalContent>
+            </Modal></li>
+          <li className="pt-4 sm:text-left text-center">Messages deleted after {deleteTime} days</li>
         </ul>
+      )
+    }else {
+      return (
+          <ul>
+          <li><Modal
+            title="Members"
+            //children={<>{MembersModalContent()}</>}
+            triggerText="List of Members"
+            isOpen={isDisplayMembersModalOpen}
+            setIsOpen={setIsDisplayMembersModalOpen}
+            >
+              <MembersModalContent></MembersModalContent>
+            </Modal></li>
+          <li className="pt-4 sm:text-left text-center">Messages deleted after {deleteTime} days</li>
+        </ul>
+      )
+    }
+  }
+
+  return (
+    <div className="basis-[85%] p-5 overflow-y-scroll flex flex-cols-2 gap-2">
+      <div className="flex flex-col w-1/5 border">
+        <h1 className="font-bold text-xl underline overflow-x-hidden sm:text-left text-center">{groupName}</h1>
+        <div>{renderGroupTabList()}</div>
       </div>
       <div className="flex flex-col w-full overflow-y-scroll">
 

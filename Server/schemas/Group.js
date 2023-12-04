@@ -9,8 +9,9 @@ const Group = new mongoose.Schema({
         required: true,
         unique: true,
         trim: true,
-        min: 1,
-        max: 15
+        minLength: 1,
+        maxLength: 15,
+        match: [/^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9_]+(?<![_.])$/, "Group name invalid, it should contain 1-15 alphanumeric letters and be unique!"], 
     },
     groupOwnerId: {
         type: String
@@ -22,12 +23,9 @@ const Group = new mongoose.Schema({
         type: Number,
         default: 1
     },
-    messages: {
-        type: [String]
-    },
     messageDeleteTime: {
         type: Number,
-        default: -1
+        default: 0
     }
 });
 

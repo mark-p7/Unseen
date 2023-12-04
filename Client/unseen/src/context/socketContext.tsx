@@ -40,10 +40,10 @@ export default function SocketProvider({ children,}: { children: React.ReactNode
     const router = useRouter();
 
     useEffect(() => {
-        if (!userStatus?.username) {
-            router.replace("/");
-            return;
-        }
+        // if (!userStatus.username) {
+        //     router.replace("/");
+        //     return;
+        // }
         const socket = socketIO.connect("https://localhost:8080/");
         socket.on("receive-message", (data: IMessage) => {
             console.log(data);

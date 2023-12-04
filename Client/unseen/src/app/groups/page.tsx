@@ -9,7 +9,6 @@ import { Modal } from "@/app/components/modal";
 import { Input } from "@/app/components/ui/input";
 import { Navbar } from "@/app/components/navbar";
 
-
 export default function Home() {
     const { userStatus } = useContext(Context);
     const router = useRouter()
@@ -48,7 +47,7 @@ export default function Home() {
         return groups.map(group => {
             if (group != null) {
                 return (
-                    <Link href={`/group-chat/${group._id}`} key={group._id} className="rounded shadow-lg border-2 border-white rounded-b p-10 pb-20 flex flex-col">
+                    <Link href={`/group-chat/${group._id}`} key={group._id} className="rounded overflow-hidden shadow-lg border-2 border-white rounded-b p-10 pb-20 flex flex-col">
                         <div className="font-bold mb-2">{group.groupName}</div>
                         <p className="text-gray-300 text-base ">
                             members: {group.groupMemberCount}
@@ -92,6 +91,35 @@ export default function Home() {
     //     })
     // }
 
+    //         const joinGroup = async () => {
+    //             await axios.post('/joinGroup', {
+    //                 groupid: invite._id, token: localStorage.getItem('auth-token')
+    //             }).then(res => {
+    //                 console.log(res); router.push(`/groups/${invite._id}`);
+    //             }).catch(err => {
+    //                 console.log(err);
+    //             });
+    //         }
+
+    //         const declineInvite = async () => {
+    //             await axios.post('/declineInvite', {
+    //                 groupid: invite._id, token: localStorage.getItem('auth-token')
+    //             }).then(res => {
+    //                 console.log(res); router.replace('/groups');
+    //             }).catch(err => {
+    //                 console.log(err);
+    //             });
+    //         }
+
+    //         return (
+    //             <TableRow key={invite.groupName}>
+    //                 <TableCell className="font-medium">{invite.groupName}</TableCell>
+    //                 <TableCell className="font-medium"><Button onClick={() => joinGroup()}>Accept</Button></TableCell>
+    //                 <TableCell className="font-medium"><Button onClick={() => declineInvite()}>Decline</Button></TableCell>
+    //             </TableRow>
+    //         )
+    //     })
+    // }
     // const createGroupHandler =async () => {
     //     if (!groupName.toString().trim().length) {
     //         return 'require';
@@ -121,7 +149,7 @@ export default function Home() {
 
         return (
             <div className="flex flex-col gap-4 p-11">
-                <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Group Name" required min={1} max={15}
+                <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Group Name" required min={1} max={15} title="Max size 15, Numbers and letters only" pattern="[A-Za-z0-9]+"
                     onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setGroupName(event.target.value)} autoFocus />
                 <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => createGroup()}>Create Group</Button>
             </div>
@@ -161,8 +189,8 @@ export default function Home() {
             <Navbar isLoggedIn={userStatus?.loggedIn} />
             <div className="h-[calc(100vh-67px)] w-full">
                 <div className="h-full w-full py-10 px-48">
-                    <div className="w-1/3"><h1 className="text-3xl font-bold">Groups</h1></div>
-                    <div className="w-1/3">
+                    <div className="w-1/3 float-left"><h1 className="text-3xl font-bold">Groups</h1></div>
+                    <div className="w-2/3 text-right md:float-right">
                         <Modal
                             title="Create Group"
                             // children={<>{ModalContent()}</>}
