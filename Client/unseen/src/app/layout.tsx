@@ -1,7 +1,7 @@
 "use client";
 import { Providers } from './providers'
-import { Context } from '../context/userContext';
-import { useContext } from 'react';
+import React from 'react';
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -11,11 +11,13 @@ export default function RootLayout({
 
   return (
     <>
-      <Providers>
-        <html lang="en">
-          <body>{children}</body>
-        </html>
-      </Providers>
+      <html lang="en" suppressHydrationWarning>
+        <body>
+          <Providers>
+            {children}
+          </Providers>
+        </body>
+      </html>
     </>
   )
 }
