@@ -4,6 +4,7 @@ import axios from 'axios';
 
 interface UserStatus {
     username: string | null;
+    displayName: string | null;
     loggedIn: boolean | null;
     userId: string | null;
     privateKey: string | null;
@@ -29,7 +30,8 @@ export const ContextProvider = ({ children }: any) => {
                     console.log(response);
                     setUserStatus({
                         username: response.data.username,
-                        loggedIn: response.data.token.length > 0 ? true : false,
+                        displayName: response.data.displayName,
+                        loggedIn: response.data.token.length > 0,
                         userId: response.data.id,
                         privateKey: localStorage.getItem('privateKey') ? localStorage.getItem('privateKey') : null,
                         publicKey: localStorage.getItem('publicKey') ? localStorage.getItem('publicKey') : null,
@@ -39,6 +41,7 @@ export const ContextProvider = ({ children }: any) => {
                 .catch(function (error) {
                     setUserStatus({
                         username: null,
+                        displayName: null,
                         loggedIn: false,
                         userId: null,
                         privateKey: localStorage.getItem('privateKey') ? localStorage.getItem('privateKey') : null,
