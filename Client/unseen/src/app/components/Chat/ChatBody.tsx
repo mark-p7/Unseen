@@ -199,7 +199,7 @@ function ChatBody({ groupId }: { groupId: string }) {
     return (
       <div className="flex flex-col gap-4 p-11">
         <Input className="border-2 border-black rounded-md px-2 py-1" type="number" placeholder="Days Visible" min='0' required pattern="^[0-9]*$"
-          onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setTempDeleteTime(Number(event.target.value))} autoFocus />
+          onKeyDown={event => onKeyDownHandler(event.key)} value ={tempDeleteTime} onChange={event => setTempDeleteTime(Number(event.target.value))} autoFocus />
         <Button className="border-2 border-black rounded-md px-2 py-1" onClick={setMsgDeleteTime}>Enter</Button>
       </div>
     )
