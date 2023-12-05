@@ -143,7 +143,7 @@ function ChatBody({ groupId }: { groupId: string }) {
         groupId: groupId
       }).then(res => {
         console.log(res);
-        setGroupMembers(res.data);
+        setGroupMembers((groupMembers) => [...groupMembers, res.data]);
       }).catch(err => {
         console.log(err);
       });

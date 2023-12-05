@@ -379,15 +379,16 @@ app.post('/api/leaveGroup', asyncWrapper(async (req, res) => {
 
 app.post('/api/removeMember', asyncWrapper(async (req, res) => {
 
-    const { groupid, userid } = req.body;
+    const { groupid, username, token } = req.body;
 
     try {
-        const user = await UserModel.findOne({ id: userid })
+        const owner = await UserModel.findOne({ token: token })
+        const user = await UserModel.findOne({ username: username })
         console.log(user);
         const group = await GroupModel.findOne({ _id: groupid })
         console.log(group);
 
-        if (group.groupOwnerId.includes(user.id)) {
+        if (group.groupOwnerId.includes(owner.id)) {
             group.groupMembers.pull(user.id);
             group.groupMemberCount = group.groupMemberCount - 1;
             user.groups.pull(group._id);
