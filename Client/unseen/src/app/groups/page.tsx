@@ -16,7 +16,7 @@ export default function Home() {
     const [groups, setGroups] = useState([groupModel])
     // const [invites, setInvites] = useState([{ groupName: "", _id: "" }])
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false);
-    const [groupName, setGroupName] = useState("");
+    // const [groupName, setGroupName] = useState("");
 
     axios.defaults.baseURL = 'https://localhost:8080/api';
 
@@ -128,9 +128,11 @@ export default function Home() {
 
     const ModalContent = () => {
 
+        const [groupToCreate, setGroupToCreate] = useState("");
+
         const createGroup = async () => {
             await axios.post('/createGroup', {
-                groupName: groupName, token: localStorage.getItem('auth-token')
+                groupName: groupToCreate, token: localStorage.getItem('auth-token')
             }).then(res => {
                 console.log(res.data);
                 setIsCreateGroupModalOpen(false);
@@ -149,8 +151,8 @@ export default function Home() {
 
         return (
             <div className="flex flex-col gap-4 p-11">
-                <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Group Name" required min={1} max={15} title="Max size 15, Numbers and letters only" pattern="[A-Za-z0-9]+"
-                    onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setGroupName(event.target.value)} autoFocus />
+                <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Group Name" 
+                    onKeyDown={event => onKeyDownHandler(event.key)} value={groupToCreate} onChange={event => setGroupToCreate(event.target.value)} autoFocus />
                 <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => createGroup()}>Create Group</Button>
             </div>
         )

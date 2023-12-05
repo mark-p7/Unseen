@@ -51,7 +51,7 @@ function ChatFooter({ groupId }: { groupId: string }) {
       })
       socket?.emit("send-message", {
         text: message,
-        name: userStatus.username,
+        name: userStatus.displayName,
         time: datePosted,
         socketId: socket.id,
         groupId: groupId,

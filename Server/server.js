@@ -379,15 +379,16 @@ app.post('/api/leaveGroup', asyncWrapper(async (req, res) => {
 
 app.post('/api/removeMember', asyncWrapper(async (req, res) => {
 
-    const { groupid, userid } = req.body;
+    const { groupid, username, token } = req.body;
 
     try {
-        const user = await UserModel.findOne({ id: userid })
+        const owner = await UserModel.findOne({ token: token })
+        const user = await UserModel.findOne({ username: username })
         console.log(user);
         const group = await GroupModel.findOne({ _id: groupid })
         console.log(group);
 
-        if (group.groupOwnerId.includes(user.id)) {
+        if (group.groupOwnerId.includes(owner.id)) {
             group.groupMembers.pull(user.id);
             group.groupMemberCount = group.groupMemberCount - 1;
             user.groups.pull(group._id);
@@ -518,20 +519,41 @@ app.post("/api/getInvites", asyncWrapper(async (req, res) => {
     res.status(200).json(groups)
 }))
 
+app.post('/api/acceptInvite', asyncWrapper(async (req, res) => {
+
+    const { groupId, token } = req.body;
+
+    const user = await UserModel.findOne({ token: token })
+    const group = await GroupModel.findOne({ _id: groupId })
+
+    if (user != undefined && user != null && group != undefined && group != null && user.invites.includes(groupId) && !user.groups.includes(groupId)) {
+        
+        user.invites.pull(groupId);
+        user.groups.push(groupId);
+        await user.save();
+
+        group.groupMembers.push(user.id);
+        group.groupMemberCount = group.groupMemberCount + 1;
+        await group.save();
+    }
+
+    res.status(200).json("Accepted Invite");
+}));
+
 app.post('/api/declineInvite', asyncWrapper(async (req, res) => {
 
-    const { groupid, token } = req.body;
+    const { token, groupId } = req.body;
 
     const user = await UserModel.findOne({ token: token })
 
-    if (user != undefined && user != null && user.invites.includes(groupid)) {
-        user.invites.pull(groupid);
+    if (user != undefined && user != null && user.invites.includes(groupId)) {
+        user.invites.pull(groupId);
         await user.save();
     }
 
     res.status(200).json("Declined Invite");
 
-}))
+}));
 
 app.post('/api/setMsgDeleteTime', asyncWrapper(async (req, res) => {
 

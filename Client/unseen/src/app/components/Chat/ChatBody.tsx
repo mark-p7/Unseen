@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/app/components/ui/input";
 import { Modal } from "@/app/components/modal";
 import { Button } from "@/app/components/ui/button";
-import { setgroups } from "process";
 
 function ChatBody({ groupId }: { groupId: string }) {
   const router = useRouter()
@@ -20,7 +19,6 @@ function ChatBody({ groupId }: { groupId: string }) {
   const [isRemoveMemberModalOpen, setIsRemoveMemberModalOpen] = useState<boolean>(false);
   const [isDisplayMembersModalOpen, setIsDisplayMembersModalOpen] = useState<boolean>(false);
   const [isMessageDeleteModalOpen, setIsMessageDeleteModalOpen] = useState<boolean>(false);
-  const [username, setUsername] = useState("");
   const [groupMembers, setGroupMembers] = useState([""]);
   const [groupName, setGroupName] = useState("Group Name");
   const [deleteTime, setDeleteTime] = useState<number>(0);
@@ -80,9 +78,11 @@ function ChatBody({ groupId }: { groupId: string }) {
 
   const InviteModalContent = () => {
 
+    const [memberToInvite, setMemberToInvite] = useState("");
+
     const sendInvite = async () => {
       await axios.post('/sendInvite', {
-        username: username, groupId: groupId, token: localStorage.getItem('auth-token')
+        username: memberToInvite, groupId: groupId, token: localStorage.getItem('auth-token')
       }).then(res => {
         console.log(res.data);
         setIsSendInviteModalOpen(false);
@@ -100,7 +100,7 @@ function ChatBody({ groupId }: { groupId: string }) {
     return (
       <div className="flex flex-col gap-4 p-11">
         <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Username" required min={1} max={15}
-          onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setUsername(event.target.value)} autoFocus />
+          onKeyDown={event => onKeyDownHandler(event.key)} value={memberToInvite} onChange={event => setMemberToInvite(event.target.value)} autoFocus />
         <Button className="border-2 border-black rounded-md px-2 py-1" onClick={sendInvite}>Send Invite</Button>
       </div>
     )
@@ -108,9 +108,11 @@ function ChatBody({ groupId }: { groupId: string }) {
 
   const RemoveModalContent = () => {
 
+    const [memberToRemove, setMemberToRemove] = useState("");
+
     const removeFromGroup = async () => {
       await axios.post('/removeMember', {
-        groupid: groupId, username: username, token: localStorage.getItem('auth-token')
+        groupid: groupId, username: memberToRemove, token: localStorage.getItem('auth-token')
       }).then(res => {
         console.log(res);
         setIsRemoveMemberModalOpen(false);
@@ -128,7 +130,7 @@ function ChatBody({ groupId }: { groupId: string }) {
     return (
       <div className="flex flex-col gap-4 p-11">
         <Input className="border-2 border-black rounded-md px-2 py-1" type="text" placeholder="Username" required min={1} max={15}
-          onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setUsername(event.target.value)} autoFocus />
+          onKeyDown={event => onKeyDownHandler(event.key)} value={memberToRemove} onChange={event => setMemberToRemove(event.target.value)} autoFocus />
         <Button className="border-2 border-black rounded-md px-2 py-1" onClick={removeFromGroup}>Remove</Button>
       </div>
     )
@@ -141,7 +143,7 @@ function ChatBody({ groupId }: { groupId: string }) {
         groupId: groupId
       }).then(res => {
         console.log(res);
-        setGroupMembers(res.data);
+        setGroupMembers((groupMembers) => [...groupMembers, res.data]);
       }).catch(err => {
         console.log(err);
       });
@@ -197,7 +199,7 @@ function ChatBody({ groupId }: { groupId: string }) {
     return (
       <div className="flex flex-col gap-4 p-11">
         <Input className="border-2 border-black rounded-md px-2 py-1" type="number" placeholder="Days Visible" min='0' required pattern="^[0-9]*$"
-          onKeyDown={event => onKeyDownHandler(event.key)} onChange={event => setTempDeleteTime(Number(event.target.value))} autoFocus />
+          onKeyDown={event => onKeyDownHandler(event.key)} value ={tempDeleteTime} onChange={event => setTempDeleteTime(Number(event.target.value))} autoFocus />
         <Button className="border-2 border-black rounded-md px-2 py-1" onClick={setMsgDeleteTime}>Enter</Button>
       </div>
     )

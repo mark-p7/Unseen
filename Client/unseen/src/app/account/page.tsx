@@ -16,6 +16,8 @@ export default function Home() {
   const [displayName, setDisplayName] = useState("");
   const [accountDeletionDate, setAccountDeletionDate] = useState("");
   const [isChangeDisplayNameModalOpen, setIsChangeDisplayNameModalOpen] = useState<boolean>(false);
+  const [isViewInvitationsModalOpen, setIsViewInvitationsModalOpen] = useState<boolean>(false);
+  const [invitations, setInvitations] = useState([]);
 
   useEffect(() => {
     if (userStatus != undefined && !userStatus?.loggedIn) {
@@ -23,6 +25,7 @@ export default function Home() {
     }
     if (userStatus?.authToken != null || userStatus?.authToken != undefined) {
       getAccountInfo();
+      getInvitations();
     }
   }, [userStatus]);
 
@@ -35,6 +38,34 @@ export default function Home() {
       setDisplayName(res.data.displayName);
       setGroupsJoined(res.data.groupsJoined);
       setAccountDeletionDate(res.data.accountDeletionDate);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  const getInvitations = async () => {
+    await axios.post('/getInvites', { token: userStatus?.authToken }).then(res => {
+      console.log(res.data);
+      setInvitations(res.data);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  const acceptInvitation = async (groupId: string) => {
+    await axios.post('/acceptInvite', { token: userStatus?.authToken, groupId: groupId }).then(res => {
+      console.log(res.data);
+      getInvitations();
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  const rejectInvitation = async (groupId: string) => {
+    console.log(userStatus?.authToken)
+    await axios.post('/declineInvite', { token: userStatus?.authToken, groupId: groupId }).then(res => {
+      console.log(res.data);
+      getInvitations();
     }).catch(err => {
       console.log(err);
     })
@@ -76,7 +107,37 @@ export default function Home() {
     deleteAccount();
   }
 
-  const ModalContent = () => {
+  const ViewInvitationsModalContent = ({ invitations }: any) => {
+
+    const invitationEventToFunctionMap = {
+      "accept": acceptInvitation,
+      "reject": rejectInvitation
+    }
+
+    const invitationEventHandler = (event: "accept" | "reject", groupId: string) => {
+      if (invitationEventToFunctionMap[event] != undefined) {
+        invitationEventToFunctionMap[event](groupId);
+        setInvitations(prev => { return prev.filter((inv: any) => inv._id != groupId) });
+      }
+    }
+
+    return (
+      <>
+        <div className="flex flex-col gap-4 p-11">
+          {invitations != undefined && invitations.length > 0 ? invitations.map((invitation: any) => {
+            return (<React.Fragment key={invitation._id}>
+              <h1 className="text-xl font-bold">{invitation.groupName}</h1>
+              <h1 className="text-lg font-bold">{invitation.groupDescription}</h1>
+              <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => invitationEventHandler("accept", invitation._id)}>Accept</Button>
+              <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => invitationEventHandler("reject", invitation._id)}>Decline</Button >
+            </React.Fragment>)
+          }) : <h1>No Invitations</h1>}
+        </div >
+      </>
+    )
+  }
+
+  const ChangeDisplayNameModalContent = () => {
 
     const [tempDisplayName, setTempDisplayName] = useState<string>("");
 
@@ -119,9 +180,17 @@ export default function Home() {
                 isOpen={isChangeDisplayNameModalOpen}
                 setIsOpen={setIsChangeDisplayNameModalOpen}
               >
-                <ModalContent></ModalContent>
+                <ChangeDisplayNameModalContent></ChangeDisplayNameModalContent>
               </Modal>
               <h1 className="mt-4 cursor-pointer">Set Auto Account Deletion</h1>
+              <Modal
+                title="View Invitations"
+                triggerText="View Invitations"
+                isOpen={isViewInvitationsModalOpen}
+                setIsOpen={setIsViewInvitationsModalOpen}
+              >
+                <ViewInvitationsModalContent invitations={invitations}></ViewInvitationsModalContent>
+              </Modal>
               <h1 className="mt-4 cursor-pointer" onClick={handleLogout}>Logout</h1>
               <h1 className="mt-4 cursor-pointer" onClick={handleDelete}>Delete Account</h1>
             </div>
