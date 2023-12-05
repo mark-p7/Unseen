@@ -13,6 +13,7 @@ const MessageModel = require('./schemas/Message.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require("dotenv");
+
 // Errors
 const {
     BadRequestError,
@@ -636,7 +637,7 @@ app.post("/api/message/getAllFromGroup", asyncWrapper(async (req, res) => {
             console.log(currentDate)
 
              if (currentDate > deleteDate) {
-                await MessageModel.deleteOne(messages[i])
+                await MessageModel.deleteOne({ _id: messages[i]._id})
                 messages.splice(i, 1)
                 i--
                 console.log("deleted")

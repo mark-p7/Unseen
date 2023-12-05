@@ -1,7 +1,4 @@
 const mongoose = require('mongoose');
-const uuid = require('uuid');
-const User = require('./User');
-const Message = require('./Message');
 
 const Group = new mongoose.Schema({
     groupName: {
