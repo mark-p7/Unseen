@@ -9,6 +9,7 @@ import React, { useContext, useEffect } from "react";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import axios from 'axios';
 import { useRouter } from "next/navigation";
+import Navbar from "@/app/components/navbar";
 
 
 interface PageParams extends Params {
@@ -58,11 +59,19 @@ function Page() {
 
   if (userStatus) {
     return (
-      <div className="flex relative flex-col w-full h-screen">
-        <ChatHeader groupId={groupId} />
-        <ChatBody groupId={groupId} />
-        <ChatFooter groupId={groupId} />
-      </div>
+      <>
+        <Navbar isLoggedIn={userStatus?.loggedIn} />
+        <div className="h-[calc(100vh-67px)] w-full">
+          <div className="h-full w-full py-10 px-48">
+            <h1 className="text-3xl font-bold">Group Chat</h1>
+            <div className="flex relative flex-col w-full h-full">
+              <ChatHeader groupId={groupId} />
+              <ChatBody groupId={groupId} />
+              <ChatFooter groupId={groupId} />
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
