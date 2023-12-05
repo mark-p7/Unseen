@@ -45,7 +45,7 @@ const server = https.createServer({
 // Create socket
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "*",
         allowedHeaders: ["my-custom-header"],
         methods: ["GET", "POST"],
         credentials: true
@@ -511,9 +511,13 @@ app.post("/api/getInvites", asyncWrapper(async (req, res) => {
     const groups = [];
     for (let i = 0; i < invites.length; i++) {
         console.log(invites[i]);
-        const group = await GroupModel.findOne({ _id: invites[i] })
-        console.log('group: ', group);
-        groups.push(group);
+        const group = await GroupModel.findOne({ _id: invites[i] }).catch(err => {
+            console.log("No group")
+        })
+        if (group != undefined && group != null) {
+            console.log('group: ', group);
+            groups.push(group);
+        }
     }
 
     // Send response
