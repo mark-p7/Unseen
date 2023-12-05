@@ -16,7 +16,7 @@ export default function Home() {
     const [groups, setGroups] = useState([groupModel])
     // const [invites, setInvites] = useState([{ groupName: "", _id: "" }])
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false);
-    const [groupName, setGroupName] = useState("");
+    // const [groupName, setGroupName] = useState("");
 
     axios.defaults.baseURL = 'https://localhost:8080/api';
 
