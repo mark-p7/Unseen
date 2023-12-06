@@ -5,14 +5,17 @@ import { myGroup } from "./Group";
 // Create instances of User for each test user
 const TestUser1 = new User("TestUser1", "wdqp132rt4qtQ#$Tqg");
 const TestUser2 = new User("TestUser2", "qweVFDz234@!");
-const TestUser3 = new User("TestUser3", "sdBNIR73%2");
+
+
+
+
 
 test.use({
   ignoreHTTPSErrors: true,
 });
 
 test.describe.serial("sequential user test login", () => {
-  test("host user login and create group and invite", async ({ page }) => { 
+  test("host user login and create group and invite", async ({ page }) => {
     //login into host user of group chat
     await page.goto("https://localhost:8080/");
     await page.goto("http://localhost:3000/");
