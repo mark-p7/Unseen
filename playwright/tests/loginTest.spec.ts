@@ -12,7 +12,7 @@ test.use({
 });
 
 test.describe.serial("sequential user test login", () => {
-  test("host user login and create group and invite", async ({ page }) => {
+  test("host user login and create group and invite", async ({ page }) => { 
     //login into host user of group chat
     await page.goto("https://localhost:8080/");
     await page.goto("http://localhost:3000/");
