@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { User } from "./User";
-import { myGroup } from "./group";
+import { myGroup } from "./Group";
 
 // Create instances of User for each test user
 const TestUser1 = new User("TestUser1", "wdqp132rt4qtQ#$Tqg");
@@ -73,7 +73,7 @@ test.describe.serial("sequential user test login", () => {
     await page.waitForTimeout(500); // wait for 500 milliseconds
     await page.getByRole("button", { name: "View Invitations" }).click();
     await page.waitForTimeout(500); // wait for 500 milliseconds
-    
+
     const acceptButton = page
       .locator(
         `text="${myGroup.name}" >> xpath=following-sibling::button[contains(@class, "inline-flex items-center justify-center") and text()="Accept"]`
