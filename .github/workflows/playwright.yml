@@ -21,7 +21,9 @@ jobs:
       - name: Setting up .env
         run: |
           echo -e "TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}\n" > .env
-          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+          echo -e "MONGO_URI=${{ secrets.MONGO_URI }}\n" >> .env
+          echo -e "SOME_32BYTE_BASE64_STRING=${{secrets.SOME_32BYTE_BASE64_STRING}}\n" >> .env
+          echo -e "SOME_64BYTE_BASE64_STRING${{secrets.SOME_64BYTE_BASE64_STRING}}" >> .env
         working-directory: Server
 
       - name: Setting up cert and key

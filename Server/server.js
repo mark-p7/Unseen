@@ -13,6 +13,7 @@ const MessageModel = require('./schemas/Message.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require("dotenv");
+
 // Errors
 const {
     BadRequestError,
@@ -44,7 +45,7 @@ const server = https.createServer({
 // Create socket
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "*",
         allowedHeaders: ["my-custom-header"],
         methods: ["GET", "POST"],
         credentials: true
@@ -510,9 +511,13 @@ app.post("/api/getInvites", asyncWrapper(async (req, res) => {
     const groups = [];
     for (let i = 0; i < invites.length; i++) {
         console.log(invites[i]);
-        const group = await GroupModel.findOne({ _id: invites[i] })
-        console.log('group: ', group);
-        groups.push(group);
+        const group = await GroupModel.findOne({ _id: invites[i] }).catch(err => {
+            console.log("No group")
+        })
+        if (group != undefined && group != null) {
+            console.log('group: ', group);
+            groups.push(group);
+        }
     }
 
     // Send response
@@ -527,7 +532,7 @@ app.post('/api/acceptInvite', asyncWrapper(async (req, res) => {
     const group = await GroupModel.findOne({ _id: groupId })
 
     if (user != undefined && user != null && group != undefined && group != null && user.invites.includes(groupId) && !user.groups.includes(groupId)) {
-        
+
         user.invites.pull(groupId);
         user.groups.push(groupId);
         await user.save();
@@ -601,6 +606,7 @@ app.post("/api/message/create", asyncWrapper(async (req, res) => {
             group: groupId,
             datePosted: datePosted,
             user: user.id,
+            displayName: user.displayName,
             content: content
         })
 
@@ -636,7 +642,7 @@ app.post("/api/message/getAllFromGroup", asyncWrapper(async (req, res) => {
             console.log(currentDate)
 
              if (currentDate > deleteDate) {
-                await MessageModel.deleteOne(messages[i])
+                await MessageModel.deleteOne({ _id: messages[i]._id})
                 messages.splice(i, 1)
                 i--
                 console.log("deleted")
@@ -714,8 +720,8 @@ app.post("/api/account/delete", asyncWrapper(async (req, res) => {
                 //console.log("after remove group: ", member);
             }
 
-            
-            
+
+
             console.log("<4>");
 
             await GroupModel.deleteOne(group)
