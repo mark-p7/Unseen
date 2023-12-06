@@ -21,10 +21,11 @@ test.describe.serial("sequential user test login logout", () => {
     await page.getByPlaceholder("Confirm Password").click();
     await page.getByPlaceholder("Confirm Password").fill(sharedUser.password);
     await page.getByRole("button", { name: "Register →" }).click();
+    await page.getByRole('link', { name: 'Account' }).click();
     await expect(
-      page.getByRole("heading", { name: sharedUser.username })
+      page.getByRole('heading', { name: `Username: ${sharedUser.username}` })
     ).toBeVisible();
-    await page.getByRole("button", { name: "Logout" }).click();
+    // await page.getByRole("button", { name: "Logout" }).click();
   });
 
   test("shared user login and delete account", async ({ page }) => {
@@ -36,8 +37,9 @@ test.describe.serial("sequential user test login logout", () => {
     await page.getByPlaceholder("password").fill(sharedUser.password);
     await page.getByRole("button", { name: "Login" }).click();
 
+    await page.getByRole('link', { name: 'Account' }).click();
     await expect(
-      page.getByRole("heading", { name: sharedUser.username })
+      page.getByRole('heading', { name: `Username: ${sharedUser.username}` })
     ).toBeVisible();
 
     //Delete user here
