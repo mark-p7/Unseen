@@ -10,6 +10,9 @@ const Message = new mongoose.Schema({
     user: {
         type: String // User id
     },
+    displayName: {
+        type: String // user display name
+    },
     group: {
         type: String // Group id
     },

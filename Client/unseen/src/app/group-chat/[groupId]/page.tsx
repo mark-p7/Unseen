@@ -43,7 +43,7 @@ function Page() {
 
     if (userStatus) {
       socket?.emit("send-message", {
-        text: userStatus.username + " joined the group.",
+        text: userStatus.displayName + " joined the group.",
         socketId: "abcd",
         groupId: groupId,
       });

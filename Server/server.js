@@ -532,7 +532,7 @@ app.post('/api/acceptInvite', asyncWrapper(async (req, res) => {
     const group = await GroupModel.findOne({ _id: groupId })
 
     if (user != undefined && user != null && group != undefined && group != null && user.invites.includes(groupId) && !user.groups.includes(groupId)) {
-        
+
         user.invites.pull(groupId);
         user.groups.push(groupId);
         await user.save();
@@ -606,6 +606,7 @@ app.post("/api/message/create", asyncWrapper(async (req, res) => {
             group: groupId,
             datePosted: datePosted,
             user: user.id,
+            displayName: user.displayName,
             content: content
         })
 
@@ -719,8 +720,8 @@ app.post("/api/account/delete", asyncWrapper(async (req, res) => {
                 //console.log("after remove group: ", member);
             }
 
-            
-            
+
+
             console.log("<4>");
 
             await GroupModel.deleteOne(group)

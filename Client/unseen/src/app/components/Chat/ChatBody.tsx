@@ -300,7 +300,7 @@ function ChatBody({ groupId }: { groupId: string }) {
               <div className="self-center">
               </div>
               <div>
-                <p className="pl-2 text-sm align-bottom">{message.name}</p>
+                <p className="pl-2 text-sm align-bottom">{message.displayName}</p>
                 {message.content && <div className={`px-3 py-1 bg-blue-900 rounded-full ${message.image ? "rounded-bl-none" : "rounded-tl-none"} w-fit`}>
                   <p className="font-sans">{message.content}</p>
                 </div>}
