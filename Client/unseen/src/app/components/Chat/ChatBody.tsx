@@ -208,7 +208,7 @@ function ChatBody({ groupId }: { groupId: string }) {
   const renderGroupTabList = () => {
     if (isGroupOwner) {
       return (
-        <ul>
+        <ul className="px-2">
           <li><Modal
             title="Send Invite"
             // children={<>{InviteModalContent()}</>}
@@ -252,7 +252,7 @@ function ChatBody({ groupId }: { groupId: string }) {
       )
     }else {
       return (
-          <ul>
+          <ul className="px-2">
           <li><Modal
             title="Members"
             //children={<>{MembersModalContent()}</>}
@@ -270,8 +270,8 @@ function ChatBody({ groupId }: { groupId: string }) {
 
   return (
     <div className="basis-[85%] p-5 overflow-y-scroll flex flex-cols-2 gap-2">
-      <div className="flex flex-col w-1/5 border">
-        <h1 className="font-bold text-xl underline overflow-x-hidden sm:text-left text-center">{groupName}</h1>
+      <div className="flex flex-col w-1/3 border">
+        <h1 className="font-bold text-xl underline overflow-x-hidden sm:text-left self-center my-2">{groupName}</h1>
         <div>{renderGroupTabList()}</div>
       </div>
       <div className="flex flex-col w-full overflow-y-scroll">

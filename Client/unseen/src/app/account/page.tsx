@@ -124,12 +124,19 @@ export default function Home() {
     return (
       <>
         <div className="flex flex-col gap-4 p-11">
-          {invitations != undefined && invitations.length > 0 ? invitations.map((invitation: any) => {
-            return (<React.Fragment key={invitation._id}>
-              <h1 className="text-xl font-bold">{invitation.groupName}</h1>
-              <h1 className="text-lg font-bold">{invitation.groupDescription}</h1>
-              <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => invitationEventHandler("accept", invitation._id)}>Accept</Button>
-              <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => invitationEventHandler("reject", invitation._id)}>Decline</Button >
+          {(invitations != undefined && invitations != null && invitations.length > 0) ? invitations.map((invitation: any, index: number) => {
+            return (<React.Fragment key={index}>
+              <>
+                {
+                  (invitation != undefined && invitation != null) &&
+                  <>
+                    <h1 className="text-xl font-bold">{invitation.groupName}</h1>
+                    <h1 className="text-lg font-bold">{invitation.groupDescription}</h1>
+                    <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => invitationEventHandler("accept", invitation._id)}>Accept</Button>
+                    <Button className="border-2 border-black rounded-md px-2 py-1" onClick={() => invitationEventHandler("reject", invitation._id)}>Decline</Button >
+                  </>
+                }
+              </>
             </React.Fragment>)
           }) : <h1>No Invitations</h1>}
         </div >
