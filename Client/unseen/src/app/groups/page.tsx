@@ -18,7 +18,7 @@ export default function Home() {
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false);
     // const [groupName, setGroupName] = useState("");
 
-    axios.defaults.baseURL = 'https://localhost:8080/api';
+    axios.defaults.baseURL = 'http://localhost:8080/api';
 
     useEffect(() => {
         // Authentication

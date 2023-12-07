@@ -31,7 +31,7 @@ function ChatFooter({ groupId }: { groupId: string }) {
   const [toastMessage, setToastMessage] = useState<string>("")
   // const params = useParams();
 
-  axios.defaults.baseURL = 'https://localhost:8080/api';
+  axios.defaults.baseURL = 'http://localhost:8080/api';
 
   const onEmojiPick = (emojiObj: any) => {
     setMessage((prevInput) => prevInput + emojiObj.emoji);

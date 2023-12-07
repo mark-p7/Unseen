@@ -24,7 +24,7 @@ export default function Home() {
     const [isChangeDisplayNameModalOpen, setIsChangeDisplayNameModalOpen] = useState<boolean>(false);
     const [username, setUsername] = useState("");
 
-    axios.defaults.baseURL = 'https://localhost:8080/api';
+    axios.defaults.baseURL = 'http://localhost:8080/api';
 
     useEffect(() => {
         // Authentication

@@ -39,7 +39,7 @@ export default function SocketProvider({ children,}: { children: React.ReactNode
         //     router.replace("/");
         //     return;
         // }
-        const socket = socketIO.connect("https://localhost:8080/");
+        const socket = socketIO.connect("http://localhost:8080/");
         socket.on("receive-message", (data: IMessage) => {
             console.log(data);
             setMessages((prev) => {

@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const db = require('./database/index.js');
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 const { Server } = require("socket.io");
 const cors = require('cors');
 const UserModel = require('./schemas/User.js')
@@ -36,11 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors())
 
 // Create server
-const server = https.createServer({
-    key: fs.readFileSync('./conf/key.pem'),
-    cert: fs.readFileSync('./conf/cert.pem'),
-    passphrase: 'pass',
-}, app);
+const server = http.createServer({}, app);
 
 // Create socket
 const io = new Server(server, {
@@ -251,8 +248,8 @@ app.post('/api/createGroup', asyncWrapper(async (req, res) => {
         const user = await UserModel.findOne({ token: token })
 
         const group = await GroupModel.create({
-            groupName: groupName, groupOwnerId: user.id,
-            groupMembers: user.id
+            groupName: groupName, groupOwnerId: user._id,
+            groupMembers: user._id
         })
 
         console.log(group);
@@ -316,7 +313,7 @@ app.post('/api/getGroupMembers', asyncWrapper(async (req, res) => {
 
         const members = [];
         for (let i = 0; i < group.groupMemberCount; i++) {
-            const user = await UserModel.findOne({ id: group.groupMembers[i] })
+            const user = await UserModel.findOne({ _id: group.groupMembers[i] })
             members.push(user.displayName);
         }
         console.log('members: ', members);
@@ -337,7 +334,7 @@ app.post('/api/joinGroup', asyncWrapper(async (req, res) => {
         const group = await GroupModel.findOne({ _id: groupid })
 
         if (user != undefined && user != null && !user.groups.includes(groupid)) {
-            group.groupMembers.push(user.id);
+            group.groupMembers.push(user._id);
             group.groupMemberCount = group.groupMemberCount + 1;
             user.groups.push(group._id);
             user.invites.pull(group._id);
@@ -361,9 +358,9 @@ app.post('/api/leaveGroup', asyncWrapper(async (req, res) => {
         const user = await UserModel.findOne({ token: token })
         const group = await GroupModel.findOne({ _id: groupid })
 
-        if (!group.groupOwnerId.includes(user.id)) {
+        if (!group.groupOwnerId.includes(user._id)) {
 
-            group.groupMembers.pull(user.id);
+            group.groupMembers.pull(user._id);
             group.groupMemberCount = group.groupMemberCount - 1;
             user.groups.pull(group._id);
 
@@ -389,8 +386,8 @@ app.post('/api/removeMember', asyncWrapper(async (req, res) => {
         const group = await GroupModel.findOne({ _id: groupid })
         console.log(group);
 
-        if (group.groupOwnerId.includes(owner.id)) {
-            group.groupMembers.pull(user.id);
+        if (group.groupOwnerId.includes(owner._id)) {
+            group.groupMembers.pull(user._id);
             group.groupMemberCount = group.groupMemberCount - 1;
             user.groups.pull(group._id);
 
@@ -413,10 +410,10 @@ app.post('/api/deleteGroup', asyncWrapper(async (req, res) => {
         const user = await UserModel.findOne({ token: token })
         const group = await GroupModel.findOne({ _id: groupid })
 
-        if (group.groupOwnerId.includes(user.id)) {
+        if (group.groupOwnerId.includes(user._id)) {
 
             for (let i = 0; i < group.groupMembers.length; i++) {
-                const user = await UserModel.findOne({ id: group.groupMembers[i] })
+                const user = await UserModel.findOne({ _id: group.groupMembers[i] })
                 console.log("user: ", user);
                 user.groups.pull(group._id);
                 await user.save();
@@ -451,7 +448,7 @@ app.post("/api/getUserId", asyncWrapper(async (req, res) => {
     }
 
     // Get User Account id
-    const userId = user.id;
+    const userId = user._id;
 
     // Send response
     res.status(200).json(userId)
@@ -479,7 +476,7 @@ app.post("/api/sendInvite", asyncWrapper(async (req, res) => {
 
     // Send Invite
     if (user != undefined && user != null && !user.invites.includes(groupId) && !user.groups.includes(groupId)
-        && group.groupOwnerId.includes(owner.id)) {
+        && group.groupOwnerId.includes(owner._id)) {
         user.invites.push(groupId)
         await user.save();
     }
@@ -537,7 +534,7 @@ app.post('/api/acceptInvite', asyncWrapper(async (req, res) => {
         user.groups.push(groupId);
         await user.save();
 
-        group.groupMembers.push(user.id);
+        group.groupMembers.push(user._id);
         group.groupMemberCount = group.groupMemberCount + 1;
         await group.save();
     }
@@ -567,7 +564,7 @@ app.post('/api/setMsgDeleteTime', asyncWrapper(async (req, res) => {
     const group = await GroupModel.findOne({ _id: groupid })
     const user = await UserModel.findOne({ token: token })
 
-    if (user != undefined && user != null && group.groupOwnerId.includes(user.id)) {
+    if (user != undefined && user != null && group.groupOwnerId.includes(user._id)) {
         group.messageDeleteTime = deleteTime;
         await group.save();
     }
@@ -585,7 +582,7 @@ app.post('/api/isGroupOwner', asyncWrapper(async (req, res) => {
 
     var isGroupOwner = false
 
-    if (user != undefined && user != null && group.groupOwnerId.includes(user.id)) {
+    if (user != undefined && user != null && group.groupOwnerId.includes(user._id)) {
         isGroupOwner = true
     }
 
@@ -605,7 +602,7 @@ app.post("/api/message/create", asyncWrapper(async (req, res) => {
         const message = await MessageModel.create({
             group: groupId,
             datePosted: datePosted,
-            user: user.id,
+            user: user._id,
             displayName: user.displayName,
             content: content
         })
@@ -707,11 +704,11 @@ app.post("/api/account/delete", asyncWrapper(async (req, res) => {
         const group = await GroupModel.findOne({ _id: groupids[i] })
         console.log("<1>");
         // Delete groups if User is owner
-        if (group.groupOwnerId.includes(user.id)) {
+        if (group.groupOwnerId.includes(user._id)) {
             console.log("<2>");
 
             for (let i = 0; i < group.groupMembers.length; i++) {
-                const member = await UserModel.findOne({ id: group.groupMembers[i] })
+                const member = await UserModel.findOne({ _id: group.groupMembers[i] })
                 console.log("<3>");
 
                 //console.log("user: ", member);

@@ -14,7 +14,7 @@ interface UserStatus {
 export const Context = createContext<any>(null);
 
 export const ContextProvider = ({ children }: any) => {
-    axios.defaults.baseURL = 'https://localhost:8080/api';
+    axios.defaults.baseURL = 'http://localhost:8080/api';
 
     const [userStatus, setUserStatus] = useState<UserStatus | undefined>();
 

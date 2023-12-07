@@ -73,7 +73,7 @@ export default function Home() {
 
   const logout = async () => {
     await axios.post('/logout', { token: userStatus?.authToken }).then(() => {
-      setUserStatus((prevState: any) => ({ ...prevState, loggedIn: false, username: null, authToken: null }));
+      setUserStatus((prevState: any) => ({ ...prevState, loggedIn: false, username: null, authToken: null, displayName: null }));
       localStorage.removeItem('username');
       localStorage.removeItem('auth-token');
       router.push('/login');
@@ -93,7 +93,7 @@ export default function Home() {
         console.log("Error deleting account");
         return;
       }
-      setUserStatus((prevState: any) => ({ ...prevState, loggedIn: false, username: null, authToken: null }));
+      setUserStatus((prevState: any) => ({ ...prevState, loggedIn: false, username: null, authToken: null, displayName: null }));
       localStorage.removeItem('username');
       localStorage.removeItem('auth-token');
       router.push('/login');

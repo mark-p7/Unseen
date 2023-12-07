@@ -36,7 +36,7 @@ export default function Home() {
     },
   })
 
-  axios.defaults.baseURL = 'https://localhost:8080/api';
+  axios.defaults.baseURL = 'http://localhost:8080/api';
 
   useEffect(() => {
     // Authentication
@@ -56,6 +56,7 @@ export default function Home() {
       localStorage.setItem('username', username);
       setUserStatus({
         username: username,
+        displayName: username,
         loggedIn: true,
         privateKey: localStorage.getItem('privateKey') || null,
         publicKey: localStorage.getItem('publicKey') || null,

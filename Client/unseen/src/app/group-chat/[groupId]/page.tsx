@@ -20,7 +20,7 @@ function Page() {
   const { groupId } = useParams<PageParams>();
   const { socket, groupUsers } = useSocket();
   const { userStatus } = useContext(Context);
-  axios.defaults.baseURL = 'https://localhost:8080/api';
+  axios.defaults.baseURL = 'http://localhost:8080/api';
   const router = useRouter()
 
   useEffect(() => {
