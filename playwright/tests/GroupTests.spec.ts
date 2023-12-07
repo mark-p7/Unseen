@@ -12,11 +12,11 @@ test.use({
   ignoreHTTPSErrors: true,
 });
 
-test.describe.serial("sequential message and kick users", () => {
+test.describe.serial("sequential process to message", () => {
   const message = `some message ${(Math.floor(Math.random() * 10000) + 10000)
     .toString()
     .substring(1)}`;
-  test("send message as guest", async ({ page }) => {
+  test("send message as host", async ({ page }) => {
     //login into host user of group chat
     await page.goto("https://localhost:8080/");
     await page.goto("http://localhost:3000/");
@@ -30,7 +30,7 @@ test.describe.serial("sequential message and kick users", () => {
       page.getByRole("heading", { name: `Username: ${TestUser3.username}` })
     ).toBeVisible();
     //
-    //navigate to
+    //navigate to group chat and send message
     await page.goto("http://localhost:3000/groups");
     await page.getByRole("link", { name: "TestGroups members: 2" }).click();
     await page.getByPlaceholder("Aa").click();
@@ -40,7 +40,7 @@ test.describe.serial("sequential message and kick users", () => {
     //
   });
 
-  test("check message, invite back", async ({ page }) => {
+  test("check message as guest", async ({ page }) => {
     //login into host user of group chat
     await page.goto("https://localhost:8080/");
     await page.goto("http://localhost:3000/");
@@ -54,11 +54,16 @@ test.describe.serial("sequential message and kick users", () => {
       page.getByRole("heading", { name: `Username: ${TestUser4.username}` })
     ).toBeVisible();
     //
+    //navigate to group chat and check if you can see the message
+    await page.goto("http://localhost:3000/groups");
+    await page.getByRole("link", { name: "TestGroups members: 2" }).click();
+    await expect(page.getByText(`${message}`).first()).toBeVisible();
+    //
   });
 });
 
-test.describe.serial("sequential user test login", () => {
-  test("host user login and create group and invite", async ({ page }) => {
+test.describe.serial("sequential Group create, delete, invite", () => {
+  test("host create group and invite", async ({ page }) => {
     //login into host user of group chat
     await page.goto("https://localhost:8080/");
     await page.goto("http://localhost:3000/");
