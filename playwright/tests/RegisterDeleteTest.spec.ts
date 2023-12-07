@@ -25,7 +25,6 @@ test.describe.serial("sequential user test login logout", () => {
     await expect(
       page.getByRole('heading', { name: `Username: ${sharedUser.username}` })
     ).toBeVisible();
-    // await page.getByRole("button", { name: "Logout" }).click();
   });
 
   test("shared user login and delete account", async ({ page }) => {

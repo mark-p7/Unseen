@@ -1,7 +1,7 @@
 name: Playwright Tests
 on:
   push:
-    branches: [main, playwright, dev]
+    branches: [main, playwright, dev, InvitationsFeature]
   pull_request:
     branches: [main, playwright, dev]
 
@@ -22,8 +22,8 @@ jobs:
         run: |
           echo -e "TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}\n" > .env
           echo -e "MONGO_URI=${{ secrets.MONGO_URI }}\n" >> .env
-          echo -e "SOME_32BYTE_BASE64_STRING=${{secrets.SOME_32BYTE_BASE64_STRING}}\n" >> .env
-          echo -e "SOME_64BYTE_BASE64_STRING${{secrets.SOME_64BYTE_BASE64_STRING}}" >> .env
+          echo -e "SOME_32BYTE_BASE64_STRING=${{ secrets.SOME_32BYTE_BASE64_STRING }}\n" >> .env
+          echo -e "SOME_64BYTE_BASE64_STRING=${{ secrets.SOME_64BYTE_BASE64_STRING }}\n" >> .env
         working-directory: Server
 
       - name: Setting up cert and key

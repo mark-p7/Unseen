@@ -6,9 +6,55 @@ import { myGroup } from "./Group";
 const TestUser1 = new User("TestUser1", "wdqp132rt4qtQ#$Tqg");
 const TestUser2 = new User("TestUser2", "qweVFDz234@!");
 const TestUser3 = new User("TestUser3", "sdBNIR73%2");
+const TestUser4 = new User("TestUser69", "sdBNIRdwabe");
 
 test.use({
   ignoreHTTPSErrors: true,
+});
+
+test.describe.serial("sequential message and kick users", () => {
+  const message = `some message ${(Math.floor(Math.random() * 10000) + 10000)
+    .toString()
+    .substring(1)}`;
+  test("send message as guest", async ({ page }) => {
+    //login into host user of group chat
+    await page.goto("https://localhost:8080/");
+    await page.goto("http://localhost:3000/");
+    await page.getByPlaceholder("username").click();
+    await page.getByPlaceholder("username").fill(TestUser3.username);
+    await page.getByPlaceholder("password").click();
+    await page.getByPlaceholder("password").fill(TestUser3.password);
+    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByRole("link", { name: "Account" }).click();
+    await expect(
+      page.getByRole("heading", { name: `Username: ${TestUser3.username}` })
+    ).toBeVisible();
+    //
+    //navigate to
+    await page.goto("http://localhost:3000/groups");
+    await page.getByRole("link", { name: "TestGroups members: 2" }).click();
+    await page.getByPlaceholder("Aa").click();
+    await page.getByPlaceholder("Aa").fill(`${message}`);
+    await page.getByPlaceholder("Aa").press("Enter");
+    await expect(page.getByText(`${message}`).first()).toBeVisible();
+    //
+  });
+
+  test("check message, invite back", async ({ page }) => {
+    //login into host user of group chat
+    await page.goto("https://localhost:8080/");
+    await page.goto("http://localhost:3000/");
+    await page.getByPlaceholder("username").click();
+    await page.getByPlaceholder("username").fill(TestUser4.username);
+    await page.getByPlaceholder("password").click();
+    await page.getByPlaceholder("password").fill(TestUser4.password);
+    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByRole("link", { name: "Account" }).click();
+    await expect(
+      page.getByRole("heading", { name: `Username: ${TestUser4.username}` })
+    ).toBeVisible();
+    //
+  });
 });
 
 test.describe.serial("sequential user test login", () => {
@@ -30,9 +76,9 @@ test.describe.serial("sequential user test login", () => {
     //creating and entering groupchat
     await page.goto("http://localhost:3000/account");
     await page.getByRole("link", { name: "Groups" }).click();
-    await page.waitForTimeout(500); // wait for 500 milliseconds
+    await page.waitForTimeout(1500); // wait for 500 milliseconds
     await page.getByRole("button", { name: "Create Group" }).click();
-    await page.waitForTimeout(500); // wait for 500 milliseconds
+    await page.waitForTimeout(1500); // wait for 500 milliseconds
     await page.getByPlaceholder("Group Name").fill(myGroup.name);
     await page.getByRole("button", { name: "Create Group" }).click();
     await page.waitForTimeout(500); // wait for 500 milliseconds
@@ -53,7 +99,8 @@ test.describe.serial("sequential user test login", () => {
     await page.waitForTimeout(1000); // wait for 500 milliseconds
     //
   });
-  test("inited user login and accept invite", async ({ page }) => {
+
+  test("invited user login and accept invite", async ({ page }) => {
     //accept invitation
     //login to inivted user
     await page.goto("https://localhost:8080/");
@@ -80,8 +127,6 @@ test.describe.serial("sequential user test login", () => {
       )
       .first();
     await acceptButton.click();
-
-    // await page.getByRole("button", { name: "Accept" }).click();
     await page.getByRole("button", { name: "Close" }).click();
     //
 
