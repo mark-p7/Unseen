@@ -12,7 +12,6 @@ test.use({
   ignoreHTTPSErrors: true,
 });
 
-
 test.describe.serial("sequential message and kick users", () => {
   const message = `some message ${(Math.floor(Math.random() * 10000) + 10000)
     .toString()
@@ -77,9 +76,9 @@ test.describe.serial("sequential user test login", () => {
     //creating and entering groupchat
     await page.goto("http://localhost:3000/account");
     await page.getByRole("link", { name: "Groups" }).click();
-    await page.waitForTimeout(500); // wait for 500 milliseconds
+    await page.waitForTimeout(1500); // wait for 500 milliseconds
     await page.getByRole("button", { name: "Create Group" }).click();
-    await page.waitForTimeout(500); // wait for 500 milliseconds
+    await page.waitForTimeout(1500); // wait for 500 milliseconds
     await page.getByPlaceholder("Group Name").fill(myGroup.name);
     await page.getByRole("button", { name: "Create Group" }).click();
     await page.waitForTimeout(500); // wait for 500 milliseconds
