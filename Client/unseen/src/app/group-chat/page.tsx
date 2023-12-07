@@ -7,11 +7,30 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import "./styling.css";
 
+import Messages from './Messages/Messages';
+
 export default function GroupChat() {
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Send message to server
+    socket.emit("message", message);
+    setMessage("");
+  };
+
   const { userStatus, setUserStatus } = useContext(Context);
   const router = useRouter();
 
   axios.defaults.baseURL = "https://localhost:8080/api";
+  
+  useEffect(() => {
+    // Receive messages from server
+    socket.on("message", (message) => {
+      setMessages((messages) => [...messages, message]);
+    });
+  }, []);
 
   useEffect(() => {
     console.log(userStatus);
@@ -23,96 +42,34 @@ export default function GroupChat() {
 
   return (
     <body>
-      <div className="header">
-        <h1>UNSEEN</h1>
-      </div>
-      <div className="sidebar">
-        <h2>Group1</h2>
-        <button>Add members</button>
-        <button>Remove members</button>
-        <button>List of members</button>
-        <button>Delete group</button>
-        <button>Auto host all*</button>
-        <button>Set how long messages stay visible</button>
-        <button>Hide group display name</button>
-      </div>
-      <div className="chatArea">
-        <div className="messageArea">
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
-          <div className="notification">User5 just joined</div>
-          <div className="message">
-            We just got the interview confirmed with our first client. - User1
-          </div>
-          <div className="warning">
-            Remember, leave all devices at home. We can't be caught doing this
-            or we risk putting their lives in danger, as well as our own! - Anon
-          </div>
+        <div className="header">
+          <h1>UNSEEN</h1>
         </div>
-        <textarea placeholder="Message" />
-      </div>
-    </body>
-  );
-}
+        <div className="sidebar">
+          <h2>Group1</h2>
+          <button>Add members</button>
+          <button>Remove members</button>
+          <button>List of members</button>
+          <button>Delete group</button>
+          <button>Auto host all*</button>
+          <button>Set how long messages stay visible</button>
+          <button>Hide group display name</button>
+        </div>
+        <div className="chatArea">
+          <div className="messageArea">
+            {messages.map((message, index) => (
+              <div key={index}>{message}</div>
+            ))}
+          </div>
+          <form onSubmit={handleSubmit}>
+            <textarea
+              placeholder="Message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+            />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      </body>
+    );
+  }

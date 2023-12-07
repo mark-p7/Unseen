@@ -109,6 +109,33 @@ app.post('/api/register', asyncWrapper(async (req, res) => {
     }
 }));
 
+// Add a new route for sending a message in a group chat
+app.post('/api/groupchat/:groupId/message', asyncWrapper(async (req, res) => {
+    const { groupId } = req.params;
+    const { message } = req.body;
+
+    // Find the group chat by ID
+    const groupChat = await GroupChatModel.findById(groupId);
+
+    if (!groupChat) {
+        return res.status(404).json({ error: 'Group chat not found' });
+    }
+
+    // Create a new message object
+    const newMessage = {
+        sender: req.user._id, // assuming you have implemented authentication and have access to the user ID
+        message: message,
+        timestamp: new Date()
+    };
+
+    // Add the new message to the group chat
+    groupChat.messages.push(newMessage);
+    await groupChat.save();
+
+    // Return the updated group chat object
+    res.json(groupChat);
+}));
+
 /**
  * This route will be used to login a new user 
  * @param {req} req = { username: String, password: String }
